@@ -1,0 +1,7 @@
+describe('My Jest Test Suite', () => {
+    test('should load the page', async () => {
+        await browser.url('https://example.com');
+        const title = await browser.getTitle();
+        expect(title).toBe('Example Domain');
+    });
+});
