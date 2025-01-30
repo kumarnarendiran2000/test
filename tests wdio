@@ -1,0 +1,34 @@
+import { expect } from 'chai';
+
+describe('Load Localhost with Cookie', () => {
+    it('should set a cookie and load the page', async () => {
+        // Define the authentication cookie
+        const authCookie = {
+            name: 'authToken',
+            value: 'your-auth-token-here', // Replace with actual auth token
+            domain: 'localhost',
+            path: '/',
+            secure: false,
+            httpOnly: false
+        };
+
+        // Open a blank page first (to set the cookie)
+        await browser.url('about:blank');
+
+        // Set the authentication cookie
+        await browser.setCookies([authCookie]);
+
+        // Open your frontend
+        await browser.url('http://localhost:3000');
+
+        // Wait for the page to load
+        await browser.pause(3000);
+
+        // Verify if cookie is set
+        const cookies = await browser.getCookies(['authToken']);
+        expect(cookies.length).to.be.greaterThan(0);
+        expect(cookies[0].value).to.equal(authCookie.value);
+
+        console.log('✅ Cookie is set, page should load with authentication.');
+    });
+});
