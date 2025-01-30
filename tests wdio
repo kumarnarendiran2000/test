@@ -32,3 +32,126 @@ describe('Load Localhost with Cookie', () => {
         console.log('✅ Cookie is set, page should load with authentication.');
     });
 });
+
+If manually grabbing the cookie and setting it isn't working, we need to debug and properly apply cross-site cookies. Here’s how we can fix it:
+
+Why is the cookie not working?
+
+1. Cross-Site Cookie Restrictions
+
+If the cookie is marked SameSite=Strict, it won't be shared between different sites.
+
+Some cookies need to be set on a proper domain match.
+
+
+
+2. Manually Setting Cookies Might Not Work
+
+The browser applies domain-specific rules. If the cookie is tied to a different origin, just setting it may not work.
+
+
+
+3. Best Approach: Use the Same Browser Session
+
+Instead of manually setting cookies, we will first log in to the original site, then open localhost:3000 in the same browser session.
+
+This will naturally pass the cookie to the next request.
+
+
+
+
+
+---
+
+✅ Final Fixed WebDriverIO Mocha Test
+
+Approach:
+
+Step 1: Log in to the first site.
+
+Step 2: Let the cookie be set naturally.
+
+Step 3: Open http://localhost:3000 in the same browser session (same context).
+
+Step 4: The cookie should be automatically passed.
+
+
+📌 Test Script (test.spec.ts):
+
+import { expect } from 'chai';
+
+describe('Login and Carry Cookie to Localhost', () => {
+    it('should login, keep the session alive, and load localhost with the same cookie', async () => {
+        // Step 1: Open login page
+        await browser.url('https://your-login-page.com'); // Replace with actual login URL
+        await browser.pause(2000);
+
+        // Step 2: Enter username and password
+        await $('#username').setValue('your-username');
+        await $('#password').setValue('your-password');
+        await $('button[type="submit"]').click();
+        await browser.pause(3000);
+
+        // Step 3: Handle MFA (enter 00000 twice)
+        for (let i = 0; i < 2; i++) {
+            await $('#mfa').setValue('00000');
+            await $('button[type="submit"]').click();
+            await browser.pause(3000);
+        }
+
+        // Step 4: Ensure we are logged in and session is active
+        const authCookies = await browser.getCookies();
+        console.log('Extracted Cookies:', authCookies);
+        expect(authCookies.length).to.be.greaterThan(0); // Ensure cookies exist
+
+        // Step 5: Open Localhost in the same session
+        await browser.url('http://localhost:3000');
+        await browser.pause(5000); // Let it fully load
+
+        // Step 6: Verify if the cookie is automatically present
+        const cookiesAfter = await browser.getCookies();
+        console.log('Cookies in Localhost:', cookiesAfter);
+        expect(cookiesAfter.length).to.be.greaterThan(0); // Ensure cookies persist
+
+        console.log('✅ Successfully logged in and transferred the session to localhost.');
+    });
+});
+
+
+---
+
+🔹 How This Works
+
+1. We don’t manually set the cookie. Instead, we log in and let the browser handle it naturally.
+
+
+2. Same session → The cookie remains intact when opening http://localhost:3000.
+
+
+3. Cross-Origin Cookies Work → The backend will authenticate using the existing cookie.
+
+
+
+
+---
+
+🚀 Run The Test
+
+pnpm wdio wdio.conf.ts
+
+
+---
+
+✅ Final Summary
+
+No need to manually set cookies.
+
+Log in normally, then navigate to localhost:3000 in the same session.
+
+The browser will naturally pass the cookie.
+
+This mimics how a real user logs in and then accesses another site.
+
+
+💡 Try this, and let me know if it works! 🚀
+
