@@ -155,3 +155,29 @@ This mimics how a real user logs in and then accesses another site.
 
 💡 Try this, and let me know if it works! 🚀
 
+{
+    "label": "Reverse Proxy Server",
+    "type": "shell",
+    "command": "pnpm",
+    "args": ["run", "--filter=scripts", "proxyServer"],
+    "isBackground": true,
+    "problemMatcher": {
+        "owner": "custom",
+        "pattern": [
+            {
+                "regexp": "HTTPS Reverse Proxy running at (https?:\\/\\/\\S+)",
+                "file": 1
+            }
+        ],
+        "background": {
+            "activeOnStart": true,
+            "beginsPattern": "Starting Reverse Proxy Server...",
+            "endsPattern": "HTTPS Reverse Proxy running at (https?:\\/\\/\\S+)"
+        }
+    },
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    }
+}
+
