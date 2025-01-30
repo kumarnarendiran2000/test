@@ -247,3 +247,4 @@ If nothing is returned, the files are fully erased.
 Let me know if you need further clarification.
 
 
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch scripts/src/utils/cert.pem scripts/src/utils/key.pem" --prune-empty --tag-name-filter cat -- --all
