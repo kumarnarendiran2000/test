@@ -42,3 +42,13 @@ Continue testing across different browsers and validate Firefox automation.
 
 📌 The goal is to have a single test suite that adapts dynamically to Web & Mobile using WebdriverIO while ensuring reliable element selection. 🚀
 
+Refined Next Steps for JIRA Comment
+
+Need to get a deeper understanding of the mobile test setup using Appium and emulators, ensuring element selection via XPath works reliably.
+
+Following this, we plan to initiate a discussion on the XPath approach and the overall testing strategy to align on the next steps.
+
+
+This keeps it structured and professional while clearly conveying the plan. 🚀 Let me know if you'd like further refinements! 😊
+
+
