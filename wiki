@@ -56,4 +56,23 @@ To prevent security risks, cert.pem and key.pem have been added to .gitignore, m
 ✅ This ensures that all HTTPS requests are properly handled by the reverse proxy while keeping sensitive files secure.
 
 
+📌 Updated PR Checklist
+
+✅ Checklist:
+
+[x] Frontend is accessible via https://local.welcome.standardlife.co.uk over HTTPS.
+
+[x] Backend API responds correctly via https://local.welcome.standardlife.co.uk/api or /secure/api over HTTPS.
+
+[x] Expo and Vite servers function correctly behind the proxy.
+
+[x] Both cert.pem and key.pem have been ignored in the commit history and verified in .gitignore.
+
+[x] Code has been commented properly for better understanding.
+
+
+📌 This ensures that SSL keys are not tracked while confirming that the HTTPS proxy setup works as expected. 🚀
+
+
+
 
