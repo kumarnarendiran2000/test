@@ -1,0 +1,64 @@
+describe('Login and Verify Dashboard Elements', () => {
+  before(async () => {
+    if (!global.isMobile) {
+      // Open login page in browser
+      await browser.url('https://soisyatl.standardlife.com/secure/customer-authentication-client/customer/login');
+      await browser.pause(2000);
+    }
+  });
+
+  it('should login, open localhost in a new tab, and check elements', async () => {
+    if (!global.isMobile) {
+      // Perform login in browser
+      for (let i = 0; i < 2; i++) {
+        await $('#userid').setValue('nonmfausername31');
+        await $('#password').setValue('ttttttt1');
+        await $('#submit').click();
+        await browser.pause(5000);
+      }
+
+      await $('#OTPcode').setValue('000000');
+      await $('#verifyCode').click();
+      await browser.pause(5000);
+
+      // Open localhost in a new tab
+      await browser.newWindow('http://localhost:8081');
+      await browser.pause(5000); // Wait for the new tab to load
+    }
+
+    // Verify total amount dynamically
+    let totalValue;
+    let managePensionButton;
+
+    if (global.isMobile) {
+      // Mobile XPath (Random for now)
+      totalValue = await $('//android.widget.TextView[contains(@text, "£")]');
+      managePensionButton = await $('//android.widget.Button[contains(@text, "Manage")]');
+    } else {
+      // Web XPath (Dynamic)
+      totalValue = await $('//span[contains(text(), "£")]');
+      managePensionButton = await $('//button[contains(text(), "Manage your pension")]');
+    }
+
+    // Verify the total amount
+    await expect(totalValue).toBeDisplayed();
+    const amountText = await totalValue.getText();
+    console.log('Captured Amount:', amountText);
+    expect(amountText).toMatch(/£\d{1,3}(,\d{3})*(\.\d{2})?/);
+
+    // Verify "Manage Your Pension" button
+    await expect(managePensionButton).toBeDisplayed();
+
+    if (!global.isMobile) {
+      // Click button (only for Web)
+      await managePensionButton.click();
+      await browser.pause(2000);
+
+      // Wait for the new tab to open
+      const handles = await browser.getWindowHandles();
+      await browser.switchToWindow(handles[1]); // Switch to the newly opened tab
+      await browser.pause(5000); // Wait for the new page to load
+      console.log('✅ Successfully opened new tab after clicking Manage Your Pension!');
+    }
+  });
+});
