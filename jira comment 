@@ -1,0 +1,53 @@
+JIRA Comment: WebdriverIO Automation Analysis Summary
+
+Current Status & Findings:
+
+Tried WebdriverIO (WDIO) for browser automation and encountered issues setting up browsers other than Chrome.
+
+Mobile automation with Appium is feasible, but the focus has been on browser testing so far.
+
+Without WDIO, browser automation seems possible across all browsers without these limitations.
+
+
+Proposed Approach Post Discussion:
+
+Plan to maintain two separate WebdriverIO configuration files:
+
+1. WDIO (without Appium) for Web Browser Testing
+
+
+2. WDIO + Appium for Android Mobile Testing (to be implemented)
+
+
+
+This will allow us to run the same test cases on both platforms by switching config files.
+
+
+Challenges Identified & Ongoing Analysis:
+
+Handling Selectors for Web & Mobile
+
+In Playwright, getByRole and getByText provide easy element access, but in WDIO + Mocha, selectors must be explicitly defined.
+
+React Native Web lacks stable CSS selectors, making it difficult to locate elements.
+
+Exploring testID usage, as standard selectors (id, class) are not easily available in Mocha WDIO unlike Playwright.
+
+
+Evaluating testID as a Common Locator
+
+testID maps to data-testid in Web and accessibilityLabel in Mobile, allowing one test case to work for both platforms.
+
+
+
+Next Steps:
+
+Resolve browser setup issues in WDIO for non-Chrome browsers.
+
+Validate testID approach for reliable element selection.
+
+Finalize the dual-config setup to ensure seamless Web & Mobile execution.
+
+
+📌 The goal is to maintain a unified test suite where the same test cases can be executed across Web & Mobile using separate WDIO configurations while ensuring stable element selection. 🚀
+
