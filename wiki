@@ -1,0 +1,41 @@
+📌 Refactored Section: Self-Signed SSL Certificate Setup
+
+Self-Signed SSL Certificate Setup for HTTPS Proxy
+
+To enable HTTPS routing via the reverse proxy, a self-signed SSL certificate must be generated and placed in the scripts/utils folder. Follow these steps:
+
+1️⃣ Generate SSL Certificate and Private Key using OpenSSL
+
+Open a bash terminal and navigate to your project's scripts/utils directory.
+
+Run the following command to generate the certificate and private key:
+
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 99999 -nodes
+
+
+2️⃣ Handle Prompts During Generation
+
+Press Enter for all options except the Common Name (CN).
+
+Enter the domain name when prompted for CN:
+
+Common Name (CN): local.welcome.standardlife.co.uk
+
+
+3️⃣ Ensure the Certificate and Key Are Stored in scripts/utils
+
+The generated cert.pem and key.pem files will be placed in the directory where the command was run.
+
+If they are generated elsewhere, move them manually to scripts/utils inside your project directory.
+
+
+4️⃣ Verify the Proxy Automatically Uses the SSL Certificate
+
+When running the frontend/backend servers, the reverse proxy will start and route requests via HTTPS automatically.
+
+
+
+---
+
+✅ Now, your HTTPS proxy is ready to handle secure requests! 🚀
+
