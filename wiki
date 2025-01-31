@@ -39,3 +39,21 @@ When running the frontend/backend servers, the reverse proxy will start and rout
 
 ✅ Now, your HTTPS proxy is ready to handle secure requests! 🚀
 
+
+📌 Refactored SSL Certificate Information for PR Description
+
+🔒 SSL Certificate Information
+
+The self-signed SSL certificates required for the HTTPS reverse proxy have been added.
+
+The certificates must be present in scripts/utils for the proxy to function.
+
+To prevent security risks, cert.pem and key.pem have been added to .gitignore, meaning they must be generated locally.
+
+
+📌 Reference: Wiki Page for SSL Certificate Setup
+
+✅ This ensures that all HTTPS requests are properly handled by the reverse proxy while keeping sensitive files secure.
+
+
+
