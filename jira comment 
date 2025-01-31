@@ -1,53 +1,44 @@
-JIRA Comment: WebdriverIO Automation Analysis Summary
 
-Current Status & Findings:
+JIRA Comment: WebdriverIO & Appium Testing Approach
 
-Tried WebdriverIO (WDIO) for browser automation and encountered issues setting up browsers other than Chrome.
+Summary of Trials & Findings:
 
-Mobile automation with Appium is feasible, but the focus has been on browser testing so far.
+Tried WebdriverIO with Appium: Successfully automated Chrome, but Edge was not possible, and Firefox is yet to be tested.
 
-Without WDIO, browser automation seems possible across all browsers without these limitations.
+Tried WebdriverIO alone: All three browsers (Chrome, Edge, Firefox) were automatable after resolving driver issues.
 
+Using the Mocha framework as the test runner for structuring and executing test cases.
 
-Proposed Approach Post Discussion:
-
-Plan to maintain two separate WebdriverIO configuration files:
-
-1. WDIO (without Appium) for Web Browser Testing
+Initial idea was to switch between Appium drivers for different browsers, but we realized that we can achieve the same by switching WebdriverIO config files—using WDIO + Appium for Mobile and WDIO without Appium for Web, while maintaining a common test suite.
 
 
-2. WDIO + Appium for Android Mobile Testing (to be implemented)
+Current Approach & Next Steps:
+
+Common Test Strategy:
+
+Using dynamic XPath for element selection across both Web & Mobile.
+
+Currently focusing on Web tests, while placeholders are in place for Mobile XPath.
+
+Next step is to validate conditional switching between Web & Mobile XPath based on config files and environment flags.
 
 
+Recent Progress:
 
-This will allow us to run the same test cases on both platforms by switching config files.
+Successfully launched the Member Dashboard via OpenAM login in the browser.
 
-
-Challenges Identified & Ongoing Analysis:
-
-Handling Selectors for Web & Mobile
-
-In Playwright, getByRole and getByText provide easy element access, but in WDIO + Mocha, selectors must be explicitly defined.
-
-React Native Web lacks stable CSS selectors, making it difficult to locate elements.
-
-Exploring testID usage, as standard selectors (id, class) are not easily available in Mocha WDIO unlike Playwright.
-
-
-Evaluating testID as a Common Locator
-
-testID maps to data-testid in Web and accessibilityLabel in Mobile, allowing one test case to work for both platforms.
-
+Verified and interacted with React Native Web elements using XPath-based automation.
 
 
 Next Steps:
 
-Resolve browser setup issues in WDIO for non-Chrome browsers.
+Implement a Page Object Model (POM) design for better test structure.
 
-Validate testID approach for reliable element selection.
+Finalize XPath selection strategy to dynamically switch between Web & Mobile elements.
 
-Finalize the dual-config setup to ensure seamless Web & Mobile execution.
+Continue testing across different browsers and validate Firefox automation.
 
 
-📌 The goal is to maintain a unified test suite where the same test cases can be executed across Web & Mobile using separate WDIO configurations while ensuring stable element selection. 🚀
+
+📌 The goal is to have a single test suite that adapts dynamically to Web & Mobile using WebdriverIO while ensuring reliable element selection. 🚀
 
