@@ -248,3 +248,26 @@ Let me know if you need further clarification.
 
 
 git filter-branch --force --index-filter "git rm --cached --ignore-unmatch scripts/src/utils/cert.pem scripts/src/utils/key.pem" --prune-empty --tag-name-filter cat -- --all
+
+
+try {
+  // ✅ Normal test execution
+  await expect(totalValue).toBeDisplayed();
+  const amountText = await totalValue.getText();
+  console.log('Captured Amount:', amountText);
+
+  await expect(managePensionButton).toBeDisplayed();
+  
+  if (!browser.isMobile) {
+    await managePensionButton.click();
+    await browser.pause(5000);
+  }
+
+  // ✅ Capture Screenshot on Success
+  await browser.saveScreenshot(`./screenshots/success/test-success-${Date.now()}.png`);
+} catch (error) {
+  // ❌ Capture Screenshot on Failure
+  console.error('Test failed! Capturing screenshot...');
+  await browser.saveScreenshot(`./screenshots/failures/test-failure-${Date.now()}.png`);
+  throw error; // Rethrow to fail the test properly
+}
