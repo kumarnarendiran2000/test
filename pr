@@ -21,3 +21,36 @@ local.welcome.standardlife.co.uk
 const { cert, privateKey } = generate([
   { name: 'commonName', value: 'local.welcome.standardlife.co.uk' }
 ]);
+
+
+Here's the updated Reverse Proxy Server task with an added comment explaining its role in notifying dependent tasks:
+
+{
+  "label": "Reverse Proxy Server", // Task to start the HTTPS reverse proxy server
+  "type": "shell",
+  "command": "pnpm",
+  "args": ["run", "--filter=scripts", "proxyServer"], // Runs the proxyServer script from the scripts package
+  "isBackground": true, // Keeps the process running in the background, allowing other tasks to start
+  "problemMatcher": {
+    "pattern": {
+      "regexp": "HTTPS Reverse Proxy running at .*" // Detects when the proxy server has started
+    }
+  },
+  "background": {
+    "activeOnStart": true, // Marks the task as active when it starts
+    "beginsPattern": "Starting Reverse Proxy Server...", // Recognizes when the proxy server begins initializing
+    "endsPattern": "HTTPS Reverse Proxy running at .*" // Marks task as complete once the proxy server is fully running
+  }
+}
+
+Additional Clarification
+
+Problem Matcher: Helps notify dependent tasks that this proxy server has started successfully and is running.
+
+Runs in Background: Ensures that frontend and backend servers dependent on this proxy can start without waiting indefinitely.
+
+
+This makes it explicit that other tasks depending on the proxy will recognize when it starts and completes.
+
+Let me know if you need more refinements!
+
