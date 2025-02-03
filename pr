@@ -54,3 +54,55 @@ This makes it explicit that other tasks depending on the proxy will recognize wh
 
 Let me know if you need more refinements!
 
+PR Title
+
+feat(tasks): Integrate Reverse Proxy Server into Task Automation
+
+
+---
+
+PR Description
+
+This PR enhances task automation by integrating the Reverse Proxy Server into VS Code tasks and launch configurations for improved dependency management.
+
+Changes Implemented:
+
+1. Added a dedicated "Reverse Proxy Server" task in tasks.json:
+
+Runs the proxy server script in the background.
+
+Uses a problem matcher to notify dependent tasks when the proxy starts and completes.
+
+Ensures other servers (frontend/backend) can start without waiting indefinitely.
+
+
+
+2. Linked Reverse Proxy to Frontend Task:
+
+Dashboard Web task now depends on the Reverse Proxy Server, ensuring it starts before launching the frontend.
+
+
+
+3. Attached Reverse Proxy to Backend & Mock Servers (launch.json):
+
+Prelaunch task added to backend and mock backend servers to start the proxy automatically in debug mode.
+
+
+
+
+Feature Validation & Testing
+
+✅ Reverse Proxy Server starts successfully in the background.
+✅ Frontend (Dashboard Web) launches after the proxy server is running.
+✅ Backend & Mock Backend servers initialize with the proxy via preLaunchTask in debug mode.
+✅ Problem matcher correctly detects when the proxy starts and completes, ensuring dependent tasks recognize its state.
+
+
+---
+
+This PR ensures that the proxy server seamlessly integrates into the local development workflow, improving automation and consistency. 🚀
+
+Let me know if you need any refinements!
+
+
+
