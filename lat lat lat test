@@ -1,0 +1,10 @@
+await browser.waitUntil(
+  async () => {
+    const cookies = await browser.getCookies();
+    return cookies.some(cookie => cookie.name === 'auth_token'); // Update cookie name
+  },
+  {
+    timeout: 10000,
+    timeoutMsg: 'Authentication cookies were not set in time',
+  }
+);
