@@ -49,3 +49,33 @@ describe('Login and Navigate to Ember POC in New Window', () => {
     await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
   });
 });
+
+it('should enter CK Number, select Ember POC, and open in new window', async () => {
+  // Enter CK Number using name attribute
+  const ckNumberInput = $('input[name="CKNumber"]');
+  await ckNumberInput.setValue('990006295028');
+
+  // Select Ember POC from Dropdown using name attribute
+  const dropdown = $('select[name="DestTestEnv"]');
+  await dropdown.selectByVisibleText('Ember POC');
+
+  // Click the "In New Window" button using input type and value
+  const inNewWindowButton = $('input[value="In New Window"]');
+  await inNewWindowButton.click();
+
+  // Wait for the new window to open
+  await browser.pause(3000);
+
+  // Get Window Handles and Switch
+  const handles = await browser.getWindowHandles();
+  await browser.switchToWindow(handles[1]); 
+
+  // Validate New Window Opened
+  console.log('Successfully switched to new window:', await browser.getTitle());
+
+  // Continue Testing in New Window...
+  await browser.pause(5000);
+
+  // Take Screenshot
+  await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
+});
