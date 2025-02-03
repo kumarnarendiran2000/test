@@ -8,3 +8,4 @@
 const { cert, privateKey } = generate([
   { name: 'commonName', value: 'local.welcome.standardlife.co.uk' }
 ]);
+
