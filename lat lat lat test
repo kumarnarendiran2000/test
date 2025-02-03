@@ -79,3 +79,79 @@ it('should enter CK Number, select Ember POC, and open in new window', async () 
   // Take Screenshot
   await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
 });
+
+describe('Login, Navigate to Ember POC, and Verify Pension Values', () => {
+  let initialTotalValue, initialInvestmentGrowth;
+
+  before(async () => {
+    if (!browser.isMobile) {
+      await browser.url('https://cdinteg.internal.standardlife.co.uk/customer-platform-test-harness');
+      await browser.maximizeWindow();
+      await browser.pause(2000);
+    }
+  });
+
+  it('should enter CK Number, select Ember POC, and open in new window', async () => {
+    // Enter CK Number
+    const ckNumberInput = $('input[name="CKNumber"]');
+    await ckNumberInput.setValue('990006295028');
+
+    // Select Ember POC from Dropdown
+    const dropdown = $('select[name="DestTestEnv"]');
+    await dropdown.selectByVisibleText('Ember POC');
+
+    // Click the "In New Window" button
+    const inNewWindowButton = $('input[value="In New Window"]');
+    await inNewWindowButton.click();
+
+    // Wait for the new window to open
+    await browser.pause(3000);
+
+    // Get Window Handles and Switch to the New Window
+    const handles = await browser.getWindowHandles();
+    await browser.switchToWindow(handles[1]);
+
+    // Validate New Window Opened
+    console.log('Successfully switched to new window:', await browser.getTitle());
+
+    // Capture Initial Total Value and Investment Growth from Ember POC
+    const totalValueElement = await $('#pensionValue');
+    const investmentGrowthElement = await $('#pensionSecondValue');
+
+    await expect(totalValueElement).toBeDisplayed();
+    await expect(investmentGrowthElement).toBeDisplayed();
+
+    initialTotalValue = await totalValueElement.getText();
+    initialInvestmentGrowth = await investmentGrowthElement.getText();
+
+    console.log('Initial Total Value:', initialTotalValue);
+    console.log('Initial Investment Growth:', initialInvestmentGrowth);
+
+    // Take Screenshot
+    await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
+  });
+
+  it('should verify total values are the same in the new window', async () => {
+    // Open Ember POC Dashboard directly (if not already opened)
+    await browser.url('https://xpf-secure.standardlife.co.uk/secure/customer-platform/dashboard/dual-ui');
+
+    // Fetch total values again in the new instance
+    const newTotalValueElement = await $('#pensionValue');
+    const newInvestmentGrowthElement = await $('#pensionSecondValue');
+
+    await expect(newTotalValueElement).toBeDisplayed();
+    await expect(newInvestmentGrowthElement).toBeDisplayed();
+
+    const newTotalValue = await newTotalValueElement.getText();
+    const newInvestmentGrowth = await newInvestmentGrowthElement.getText();
+
+    // Compare values with previously stored values
+    console.log('New Total Value:', newTotalValue);
+    console.log('New Investment Growth:', newInvestmentGrowth);
+
+    expect(newTotalValue).toEqual(initialTotalValue);
+    expect(newInvestmentGrowth).toEqual(initialInvestmentGrowth);
+
+    console.log('✅ Pension values match successfully between both windows!');
+  });
+});
