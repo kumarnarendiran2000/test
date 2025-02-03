@@ -9,3 +9,15 @@ const { cert, privateKey } = generate([
   { name: 'commonName', value: 'local.welcome.standardlife.co.uk' }
 ]);
 
+
+local.welcome.standardlife.co.uk
+
+/**
+ * SSL Certificate Generation:
+ * - Uses the `selfsigned` package to generate a self-signed SSL certificate dynamically.
+ * - The `generate` method is called with an option to set the Common Name (CN) as `local.welcome.standardlife.co.uk`.
+ * - The generated certificate and private key are used to enable HTTPS communication for the reverse proxy.
+ */
+const { cert, privateKey } = generate([
+  { name: 'commonName', value: 'local.welcome.standardlife.co.uk' }
+]);
