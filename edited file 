@@ -1,0 +1,97 @@
+import { browser, expect } from '@wdio/globals';
+
+describe('End-to-End Pension Dashboard Verification', () => {
+  
+  before(async () => {
+    if (!browser.isMobile) {
+      await browser.url('https://soisyst1.standardlife.com/secure/customer-authentication-client/customer/login');
+      await browser.maximizeWindow();
+      await browser.pause(2000); // Allow page load
+    }
+  });
+
+  it('should log in and open Test Harness', async () => {
+    if (!browser.isMobile) {
+      // Perform login steps
+      for (let i = 0; i < 2; i++) {
+        await $('#userid').setValue('nonmfausername31');
+        await $('#password').setValue('Tttttttt1');
+        await $('#submit').click();
+        await browser.pause(1000);
+      }
+
+      await $('#OTPcode').setValue('000000');
+      await $('#verifyCode').click();
+      await browser.pause(5000);
+
+      // Open Test Harness URL in a new tab
+      await browser.newWindow('https://cdinteg.internal.standardlife.co.uk/customer-platform-test-harness', { type: 'tab' });
+    }
+  });
+
+  it('should enter CK Number, select Ember POC, and open in a new window', async () => {
+    // Enter CK Number
+    const ckNumberInput = $('input[name="CKNumber"]');
+    await ckNumberInput.setValue('990006295028');
+
+    // Select Ember POC from Dropdown
+    const dropdown = $('select[name="DestTestEnv"]');
+    await dropdown.selectByVisibleText('Ember POC');
+
+    // Click the "In New Window" button
+    const inNewWindowButton = $('input[value="In New Window"]');
+    await inNewWindowButton.click();
+
+    // Wait and switch to new window
+    await browser.pause(3000);
+    const handles = await browser.getWindowHandles();
+    await browser.switchToWindow(handles[2]);
+
+    // Validate and take a screenshot
+    console.log('Successfully switched to new window:', await browser.getTitle());
+    await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
+  });
+
+  it('should verify pension values and match with previous window', async () => {
+    let totalValue, managePensionButton;
+
+    if (browser.isMobile) {
+      // Mobile selectors (Dummy for now)
+      totalValue = $(`//android.widget.TextView[contains(@text, "£")]`);
+      managePensionButton = $(`//android.widget.Button[contains(@text, "Manage")]`);
+    } else {
+      await browser.pause(3000);
+      totalValue = $(`//span[contains(text(), "£")]`);
+      managePensionButton = $(`//span[contains(text(), "Manage your pension")]`);
+    }
+
+    await expect(totalValue).toBeDisplayed();
+    const amountText = await totalValue.getText();
+    console.log('Captured Amount:', amountText);
+
+    // Open new pension dashboard in another tab
+    await browser.pause(5000);
+    await browser.newWindow('https://syst-secure.standardlife.co.uk/secure/customer-platform/dashboard?sla1-ui', { type: 'tab' });
+
+    // Fetch new pension value
+    const newTotalValueElement = $('#pensionValue');
+    await expect(newTotalValueElement).toBeDisplayed();
+    const newTotalValue = await newTotalValueElement.getText();
+
+    // Compare values
+    console.log('New Total Value:', newTotalValue);
+    expect(newTotalValue).toEqual(amountText);
+    console.log('Pension values match successfully between both windows!');
+
+    // Final validations and screenshot
+    await expect(managePensionButton).toBeDisplayed();
+    if (!browser.isMobile) {
+      await managePensionButton.click();
+      await browser.pause(5000);
+    }
+
+    await browser.saveScreenshot(`./screenshots/success/test-success-${Date.now()}.png`);
+    console.log('Successfully opened new tab after clicking Manage Your Pension!');
+  });
+
+});
