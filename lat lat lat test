@@ -8,3 +8,44 @@ await browser.waitUntil(
     timeoutMsg: 'Authentication cookies were not set in time',
   }
 );
+
+
+describe('Login and Navigate to Ember POC in New Window', () => {
+  before(async () => {
+    if (!browser.isMobile) {
+      await browser.url('https://cdinteg.internal.standardlife.co.uk/customer-platform-test-harness');
+      await browser.maximizeWindow();
+      await browser.pause(2000); // Wait for page to load
+    }
+  });
+
+  it('should enter CK Number, select Ember POC, and open in new window', async () => {
+    // Enter CK Number
+    const ckNumberInput = $('#CKNumber');  // Using ID from Inspect
+    await ckNumberInput.setValue('990006295028');
+
+    // Select Ember POC from Dropdown
+    const dropdown = $('#DestTestEnv'); // Dropdown by ID
+    await dropdown.selectByVisibleText('Ember POC');
+
+    // Click the "In New Window" button
+    const inNewWindowButton = $('input[value="In New Window"]');
+    await inNewWindowButton.click();
+
+    // Wait for the new window to open
+    await browser.pause(3000);
+
+    // Get Window Handles
+    const handles = await browser.getWindowHandles();
+    await browser.switchToWindow(handles[1]); // Switch to new window
+
+    // Validate New Window Opened
+    console.log('Successfully switched to new window:', await browser.getTitle());
+
+    // Continue Testing in New Window...
+    await browser.pause(5000);  // Adjust as needed
+
+    // Take Screenshot
+    await browser.saveScreenshot(`./screenshots/success/new-window-${Date.now()}.png`);
+  });
+});
