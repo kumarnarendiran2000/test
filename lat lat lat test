@@ -155,3 +155,7 @@ describe('Login, Navigate to Ember POC, and Verify Pension Values', () => {
     console.log('✅ Pension values match successfully between both windows!');
   });
 });
+
+
+const growthValue = await $('//span[contains(text(), "Growth")]/following-sibling::div').getText();
+console.log("Captured Growth Value:", growthValue);
