@@ -26,3 +26,32 @@ describe('Verify Pension Values on React Native Web', () => {
     console.log('✅ Pension Values Successfully Verified on React Native Web App!');
   });
 });
+
+describe('Verify Pension Values on Web (Browser)', () => {
+  let totalValue, investmentGrowth;
+
+  it('Fetch Total Value and Investment Growth from Web', async () => {
+    // Locate elements in Web (Angular app)
+    const totalValueElement = await $('span.blue-clr'); // Total Value
+    const investmentGrowthElement = await $('span.text-success-700'); // Investment Growth
+
+    // Ensure elements are displayed before fetching text
+    await expect(totalValueElement).toBeDisplayed();
+    await expect(investmentGrowthElement).toBeDisplayed();
+
+    // Extract text values
+    totalValue = await totalValueElement.getText();
+    investmentGrowth = await investmentGrowthElement.getText();
+
+    console.log(`Web App - Total Value: ${totalValue}`);
+    console.log(`Web App - Investment Growth: ${investmentGrowth}`);
+  });
+
+  it('Validate Pension Values Are Not Empty', async () => {
+    // Ensure values are properly fetched
+    expect(totalValue).not.toBe('');
+    expect(investmentGrowth).not.toBe('');
+
+    console.log('✅ Pension Values Successfully Verified on Web!');
+  });
+});
