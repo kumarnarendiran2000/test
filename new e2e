@@ -1,0 +1,75 @@
+import { browser } from '@wdio/globals';
+
+/**
+ * Authenticates the browser session by setting cookies.
+ * @param standardlifeId Standard Life ID of the test user.
+ */
+export async function authenticate(standardlifeId: string) {
+  await browser.setCookies([
+    { name: 'ck', value: standardlifeId, path: '/', domain: 'localhost' },
+  ]);
+}
+
+export const defaultUser = {
+  standardlifeId: '970205143728',
+};
+
+export const testPacks = [
+  {
+    standardlifeId: '990008710739',
+    welcomeName: 'TestUser',
+    planValue: 46670,
+    investmentGrowth: 20375,
+  },
+  {
+    standardlifeId: '952000708475',
+    welcomeName: 'Tony',
+    planValue: 10000000,
+    investmentGrowth: 90000000,
+  },
+];
+
+import { browser, expect } from '@wdio/globals';
+import { authenticate } from '../utils/authenticate';
+import { defaultUser, testPacks } from '../test-config';
+
+describe('Login and Carry Cookie to Localhost', () => {
+  before(async () => {
+    await browser.setWindowRect(1920, 0, 1200, 800);
+    await browser.maximizeWindow();
+  });
+
+  it('should login, keep the session alive, and load localhost with the cookie', async () => {
+    await authenticate(defaultUser.standardlifeId);
+
+    await browser.newWindow('http://localhost:8081/', { type: 'tab' });
+
+    await browser.pause(5000);
+
+    const totalValueElement = $('//span[contains(text(), "£")]');
+    await expect(totalValueElement).toBeDisplayed();
+
+    const totalValueFromEmber = await totalValueElement.getText();
+    console.log(`Total Value: ${totalValueFromEmber}`);
+  });
+});
+
+describe('Validate Dynamic Data Across Users', () => {
+  testPacks.forEach((testPack) => {
+    describe(`CK: ${testPack.standardlifeId}`, () => {
+      it(`should authenticate and validate values for ${testPack.welcomeName}`, async () => {
+        await authenticate(testPack.standardlifeId);
+        await browser.newWindow('http://localhost:8081/', { type: 'tab' });
+
+        const totalValueElement = $('//span[contains(text(), "£")]');
+        await expect(totalValueElement).toBeDisplayed();
+
+        const totalValueFromEmber = await totalValueElement.getText();
+        console.log(`Total Value for ${testPack.welcomeName}: ${totalValueFromEmber}`);
+
+        expect(totalValueFromEmber).toEqual(testPack.planValue.toLocaleString());
+      });
+    });
+  });
+});
+
