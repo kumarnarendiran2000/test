@@ -1,0 +1,37 @@
+import { browser } from '@wdio/globals';
+
+describe('Login and Set Cookie Before Navigating', () => {
+
+  before(async () => {
+    if (!browser.isMobile) {
+      await browser.url('https://soisyst1.standardlife.com/secure/customer-authentication-client/customer/login');
+      await browser.maximizeWindow();
+      await browser.pause(2000); // Allow page load
+    }
+  });
+
+  it('should login and set cookies before opening localhost', async () => {
+    // Perform login steps
+    await $('#userid').setValue('nonmfausername31');
+    await $('#password').setValue('Tttttttt1');
+    await $('#submit').click();
+    await browser.pause(2000);
+
+    // Set Cookies before opening localhost
+    await browser.setCookies([
+      {
+        name: 'ck',
+        value: 'standardlife12345',  // Replace with dynamic value
+        path: '/',
+        domain: 'localhost',
+      }
+    ]);
+
+    console.log('Cookie set successfully');
+
+    // Navigate to localhost after setting cookies
+    await browser.url('http://localhost:8081');
+    await browser.pause(5000);
+  });
+
+});
