@@ -73,3 +73,40 @@ describe('Validate Dynamic Data Across Users', () => {
   });
 });
 
+
+import { handle } from 'hono/aws-lambda';
+import { HTTPException } from 'hono/http-exception';
+import type { JSONObject } from 'hono/utils/types';
+import { factory } from './hono-factory';
+import { authenticationAdapter } from './middlewares/authentication-adapter';
+import { delay } from './middlewares/delay';
+import { v4 as uuidv4 } from 'uuid';
+
+export const app = factory.createApp();
+
+app.use('/secure/*', authenticationAdapter);
+app.use('/secure/*', delay);
+
+// Health check route
+app.get('/healthcheck', async (c) => {
+  return c.text('Mock SLAL legacy API server up and running');
+});
+
+// Mock CSRF Token API
+app.get('/secure/customer-platform/rest/api/csrftoken', async (c) => {
+  const csrfToken = uuidv4(); // Generate a unique token
+  return c.json({ csrfToken });
+});
+
+// Mock Logout API
+app.get('/secure/customer-platform/logout', async (c) => {
+  const csrfToken = c.req.query('CSRF_TOKEN'); // Retrieve the token from query params
+
+  if (!csrfToken) {
+    throw new HTTPException(400, { message: 'CSRF token is required' });
+  }
+
+  return c.json({ message: 'Logout successful', csrfToken });
+});
+
+export default app;
