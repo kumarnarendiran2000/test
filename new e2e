@@ -122,3 +122,16 @@ const latestPayment = await latestPaymentElement.getText();
 console.log(`Total Value: ${totalValue}`);
 console.log(`Total Payments: ${totalPayments}`);
 console.log(`Latest Payment: ${latestPayment}`);
+
+
+const totalValueElement = await $('//div[span[contains(text(), "Total value")]]/following-sibling::div/span[contains(text(), "€")]');
+const totalPaymentsElement = await $('//div[span[contains(text(), "Total payments")]]/following-sibling::div/span[contains(text(), "€")]');
+const latestPaymentElement = await $('//div[span[contains(text(), "Latest payment")]]/following-sibling::div/span[contains(text(), "€")]');
+
+const totalValue = await totalValueElement.getText();
+const totalPayments = await totalPaymentsElement.getText();
+const latestPayment = await latestPaymentElement.getText();
+
+console.log(`Total Value: ${totalValue}`);
+console.log(`Total Payments: ${totalPayments}`);
+console.log(`Latest Payment: ${latestPayment}`);
