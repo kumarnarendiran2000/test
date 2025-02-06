@@ -55,3 +55,24 @@ describe('Verify Pension Values on Web (Browser)', () => {
     console.log('✅ Pension Values Successfully Verified on Web!');
   });
 });
+
+Here’s a refined version of your Jira comment, ensuring clarity, coherence, and alignment with your last Jira update:
+
+
+---
+
+Progress Update on WebDriverIO & XPath Automation
+
+We have been working on automating various flows using the XPath approach, particularly focusing on OpenAM login, customer dashboard navigation, and comparing the Ember dashboard hosted on AWS with legacy SLAL API data screens.
+
+Currently, we can successfully execute the first comparison method and validate growth values. Now, we are extending the automation to cover additional components on the screen while refining our approach for improved efficiency.
+
+Additionally, we have explored and implemented data retrieval from the local mock backend and SLAL server, enabling the setup of a local frontend and server to test and verify mock data components on-screen.
+
+Next steps include refining the existing automation, structuring the code in a more organized manner, and implementing the Page Object Model (POM) for better maintainability. We will also continue discussions on the XPath approach moving forward.
+
+
+---
+
+This version improves readability and makes the progress and next steps clearer. Let me know if you need further refinements!
+
