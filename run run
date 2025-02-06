@@ -1,0 +1,28 @@
+describe('Verify Pension Values on React Native Web', () => {
+  let webTotalValue, webInvestmentGrowth;
+
+  it('Fetch Total Value and Investment Growth from React Native Web App', async () => {
+    // Locate elements in React Native Web app
+    const totalValueElement = await $('//span[contains(text(), "£")]'); // Total Value
+    const investmentGrowthElement = await $('//div[contains(@class, "text-success-700") or contains(text(), "+")]'); // Investment Growth
+
+    // Ensure elements are displayed before fetching text
+    await expect(totalValueElement).toBeDisplayed();
+    await expect(investmentGrowthElement).toBeDisplayed();
+
+    // Extract text values
+    webTotalValue = await totalValueElement.getText();
+    webInvestmentGrowth = await investmentGrowthElement.getText();
+
+    console.log(`Web App - Total Value: ${webTotalValue}`);
+    console.log(`Web App - Investment Growth: ${webInvestmentGrowth}`);
+  });
+
+  it('Validate Pension Values Are Not Empty', async () => {
+    // Ensure values are properly fetched
+    expect(webTotalValue).not.toBe('');
+    expect(webInvestmentGrowth).not.toBe('');
+
+    console.log('✅ Pension Values Successfully Verified on React Native Web App!');
+  });
+});
