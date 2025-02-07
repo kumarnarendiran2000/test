@@ -143,3 +143,33 @@ const savingsButton = await $('//div[contains(text(), "Savings")]');
 if (await savingsButton.isDisplayed()) {
     await savingsButton.click();
 }
+
+
+import { cors } from 'hono/cors';
+import { factory } from '../hono-factory';
+
+// Define allowed origins regex directly
+const allowedHostsRegex = /https?:\/\/(localhost|example\.com|staging\.yourapp\.com)/; 
+
+export const handleCors = factory.createMiddleware(async (c, next) => {
+  const origin = c.req.header('Origin'); // Get Origin header from request
+
+  if (origin?.match(allowedHostsRegex)) {  // Check if origin matches allowed hosts
+    return cors({
+      origin,  
+      allowHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin'
+      ],
+      allowMethods: ['GET', 'POST', 'OPTIONS'],
+      exposeHeaders: ['Content-Length'],
+      maxAge: 600,
+      credentials: true
+    })(c, next);
+  }
+
+  return next(); // Proceed without CORS headers if origin doesn't match
+});
