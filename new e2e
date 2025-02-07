@@ -173,3 +173,5 @@ export const handleCors = factory.createMiddleware(async (c, next) => {
 
   return next(); // Proceed without CORS headers if origin doesn't match
 });
+
+//p[contains(text(), 'Tax-free cash remaining')]/following-sibling::span[contains(., '£')]
