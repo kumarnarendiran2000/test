@@ -135,3 +135,6 @@ const latestPayment = await latestPaymentElement.getText();
 console.log(`Total Value: ${totalValue}`);
 console.log(`Total Payments: ${totalPayments}`);
 console.log(`Latest Payment: ${latestPayment}`);
+
+
+const otpPageHeading = await $("//h3[contains(., 'Enter verification code')]");
