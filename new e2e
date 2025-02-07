@@ -175,3 +175,5 @@ export const handleCors = factory.createMiddleware(async (c, next) => {
 });
 
 //p[contains(text(), 'Tax-free cash remaining')]/following-sibling::span[contains(., '£')]
+
+//p[contains(text(), 'Total transfer value')]/preceding-sibling::span
