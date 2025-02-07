@@ -177,3 +177,15 @@ export const handleCors = factory.createMiddleware(async (c, next) => {
 //p[contains(text(), 'Tax-free cash remaining')]/following-sibling::span[contains(., '£')]
 
 //p[contains(text(), 'Total transfer value')]/preceding-sibling::span
+
+
+
+async function waitForElementToBeDisplayed(selector: string, timeout: number = 5000) {
+    await browser.waitUntil(
+        async () => await $(selector).isDisplayed(),
+        {
+            timeout: timeout,
+            timeoutMsg: `Element ${selector} was not displayed within ${timeout} ms`
+        }
+    );
+}
