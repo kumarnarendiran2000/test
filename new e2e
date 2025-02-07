@@ -138,3 +138,8 @@ console.log(`Latest Payment: ${latestPayment}`);
 
 
 const otpPageHeading = await $("//h3[contains(., 'Enter verification code')]");
+
+const savingsButton = await $('//div[contains(text(), "Savings")]');
+if (await savingsButton.isDisplayed()) {
+    await savingsButton.click();
+}
