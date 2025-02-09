@@ -1,0 +1,45 @@
+const buttons = [
+    { label: "First Button", shouldOpenNewTab: true, expectedUrlEnding: "/first-page" },
+    { label: "Second Button", shouldOpenNewTab: true, expectedUrlEnding: "/second-page" },
+    { label: "Third Button", shouldOpenNewTab: false, expectedUrlEnding: "/last-page" }, // Last button, stays in the same tab
+];
+
+it("should navigate through buttons and verify URLs", async () => {
+    const originalWindow = await browser.getWindowHandle(); // Store Ember Dashboard tab
+
+    for (const button of buttons) {
+        // Find button using aria-label
+        const buttonElement = await $(`aria/${button.label}`);
+
+        // Check if button exists
+        await expect(buttonElement).toBeDisplayed();
+
+        // Click the button
+        await buttonElement.click();
+
+        if (button.shouldOpenNewTab) {
+            // Wait for new tab to open
+            await browser.waitUntil(
+                async () => (await browser.getWindowHandles()).length > 1,
+                { timeout: 5000, timeoutMsg: "New tab did not open" }
+            );
+
+            const handles = await browser.getWindowHandles();
+            await browser.switchToWindow(handles[handles.length - 1]); // Switch to new tab
+
+            // Verify URL ends with expected value
+            const currentUrl = await browser.getUrl();
+            expect(currentUrl.endsWith(button.expectedUrlEnding)).toBeTruthy();
+
+            // Close the new tab
+            await browser.closeWindow();
+
+            // Switch back to Ember Dashboard tab
+            await browser.switchToWindow(originalWindow);
+        } else {
+            // If last button, verify URL but do not switch back
+            const currentUrl = await browser.getUrl();
+            expect(currentUrl.endsWith(button.expectedUrlEnding)).toBeTruthy();
+        }
+    }
+});
