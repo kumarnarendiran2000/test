@@ -56,3 +56,18 @@ await browser.waitUntil(
         timeoutMsg: 'Page did not fully load with all resources',
     }
 );
+
+
+await browser.waitUntil(
+    async () => {
+        const activeRequests = await browser.execute(() =>
+            window.performance.getEntriesByType('resource').filter(r => r.responseEnd === 0).length
+        );
+        console.log(`Active requests: ${activeRequests}`);
+        return activeRequests === 0;
+    },
+    {
+        timeout: 15000,
+        timeoutMsg: 'Network requests are still running!',
+    }
+);
