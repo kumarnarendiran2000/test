@@ -43,3 +43,16 @@ it("should navigate through buttons and verify URLs", async () => {
         }
     }
 });
+
+
+await browser.waitUntil(
+    async () => {
+        const readyState = await browser.execute(() => document.readyState);
+        const networkIdle = await browser.execute(() => performance.getEntriesByType('resource').length === 0);
+        return readyState === 'complete' && networkIdle;
+    },
+    {
+        timeout: 15000,
+        timeoutMsg: 'Page did not fully load with all resources',
+    }
+);
