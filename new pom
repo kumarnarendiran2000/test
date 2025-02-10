@@ -272,3 +272,18 @@ Runs tests in an isolated environment with only one spec file for efficiency.
 This should now work in your CI pipeline as expected. 🚀
 
 
+- name: Start Backend Mock Server
+  run: pnpm --filter back-end serve:mock &
+
+- name: Start Mock SLAL Server
+  run: pnpm --filter mock-legacy-slal-api serve:local &
+
+- name: Start Frontend Server
+  run: pnpm --filter @ember/dashboard web &
+
+- name: Wait for Frontend to Start
+  run: sleep 30 # Adjust time based on your server startup time
+
+- name: Run WebDriverIO E2E Test
+  run: pnpm test:e2e --spec=tests/e2e/specs/mockdatatest.e2e.ts
+
