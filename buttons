@@ -71,3 +71,5 @@ await browser.waitUntil(
         timeoutMsg: 'Network requests are still running!',
     }
 );
+
+//img[contains(@class, 'money-img') and contains(@src, 'money-mindset.png')]
