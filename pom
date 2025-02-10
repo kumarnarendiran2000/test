@@ -1,0 +1,406 @@
+Got it! Here's a refined Page Object Model (POM) structure based on what you need:
+
+DG Dashboard (Opens after login)
+
+Ember Dashboard (Opens via URL without login, but has different selectors)
+
+Login Page (Handles authentication)
+
+Selectors (Separate for DG Dashboard and Ember Dashboard)
+
+Reusable Helper Functions (For wait conditions, window handling)
+
+
+
+---
+
+📂 Folder Structure
+
+tests/
+│── e2e/
+│   ├── specs/
+│   │   ├── testScenario.e2e.ts  <-- Calls all page objects, main test file
+│   ├── pages/
+│   │   ├── loginPage.ts  <-- Handles login to DG Dashboard
+│   │   ├── dgDashboardPage.ts  <-- Extracts values from DG Dashboard
+│   │   ├── emberDashboardPage.ts  <-- Opens Ember Dashboard from a URL & extracts values
+│   ├── selectors/
+│   │   ├── dgDashboardSelectors.ts  <-- Stores DG Dashboard selectors
+│   │   ├── emberDashboardSelectors.ts  <-- Stores Ember Dashboard selectors
+│   ├── utils/
+│   │   ├── helpers.ts  <-- Reusable functions (waitForElement, etc.)
+│   ├── testConfig.ts  <-- Stores test users, base URLs, and credentials
+
+
+---
+
+1️⃣ Login Page (loginPage.ts)
+
+import { expect } from '@wdio/globals';
+
+class LoginPage {
+    get usernameField() { return $('#userid'); }
+    get passwordField() { return $('#password'); }
+    get submitButton() { return $('#submit'); }
+    get otpCodeField() { return $('#OTPcode'); }
+    get verifyCodeButton() { return $('#verifyCode'); }
+
+    async openLoginPage(url: string) {
+        await browser.url(url);
+    }
+
+    async login(username: string, password: string) {
+        await this.usernameField.setValue(username);
+        await this.passwordField.setValue(password);
+        await this.submitButton.click();
+
+        const otpHeading = await $('//h3[contains(.,"Enter verification code")]');
+        if (await otpHeading.isDisplayed()) {
+            await this.otpCodeField.setValue('000000');
+            await this.verifyCodeButton.click();
+        }
+    }
+}
+
+export default new LoginPage();
+
+
+---
+
+2️⃣ DG Dashboard Page (dgDashboardPage.ts)
+
+import { expect } from '@wdio/globals';
+import DgDashboardSelectors from '../selectors/dgDashboardSelectors';
+
+class DgDashboardPage {
+    async waitForDashboard() {
+        await expect($(DgDashboardSelectors.totalValue)).toBeDisplayed();
+    }
+
+    async extractValues() {
+        return {
+            totalValue: await $(DgDashboardSelectors.totalValue).getText(),
+            totalTransferValue: await $(DgDashboardSelectors.totalTransferValue).getText(),
+            growthValue: await $(DgDashboardSelectors.growthValue).getText(),
+            savingsValue: await $(DgDashboardSelectors.savingsValue).getText(),
+            insuranceValue: await $(DgDashboardSelectors.insuranceValue).getText(),
+            taxFreeCashRemaining: await $(DgDashboardSelectors.taxFreeCashRemaining).getText(),
+            totalWithdrawValue: await $(DgDashboardSelectors.totalWithdrawValue).getText(),
+        };
+    }
+}
+
+export default new DgDashboardPage();
+
+
+---
+
+3️⃣ Ember Dashboard Page (emberDashboardPage.ts)
+
+import { expect } from '@wdio/globals';
+import EmberDashboardSelectors from '../selectors/emberDashboardSelectors';
+
+class EmberDashboardPage {
+    async openDashboard(url: string) {
+        await browser.newWindow(url, { type: 'tab' });
+    }
+
+    async waitForDashboard() {
+        await expect($(EmberDashboardSelectors.totalValue)).toBeDisplayed();
+    }
+
+    async extractValues() {
+        return {
+            totalValue: await $(EmberDashboardSelectors.totalValue).getText(),
+            totalTransferValue: await $(EmberDashboardSelectors.totalTransferValue).getText(),
+            totalPayment: await $(EmberDashboardSelectors.totalPayment).getText(),
+            latestPayment: await $(EmberDashboardSelectors.latestPayment).getText(),
+            investmentGrowth: await $(EmberDashboardSelectors.investmentGrowth).getText(),
+        };
+    }
+}
+
+export default new EmberDashboardPage();
+
+
+---
+
+4️⃣ DG Dashboard Selectors (dgDashboardSelectors.ts)
+
+export default {
+    totalValue: '//p[contains(text(), "Total value")]/preceding-sibling::span[contains(.,"£")]',
+    totalTransferValue: '//p[contains(text(), "Total transfer value")]/preceding-sibling::span[contains(.,"£")]',
+    growthValue: '//p[contains(text(), "Investment growth")]/preceding-sibling::span[contains(.,"£")]',
+    savingsValue: '//div[contains(text(), "Savings")]',
+    insuranceValue: '//div[contains(text(), "Life insurance")]',
+    taxFreeCashRemaining: '//p[contains(text(), "Tax-free cash remaining")]/preceding-sibling::span[contains(.,"£")]',
+    totalWithdrawValue: '//p[contains(text(), "Total net withdrawals")]/preceding-sibling::span[contains(.,"£")]',
+};
+
+
+---
+
+5️⃣ Ember Dashboard Selectors (emberDashboardSelectors.ts)
+
+export default {
+    totalValue: '//span[contains(text(), "Total value")]/following-sibling::div/span[contains(.,"£")]',
+    totalTransferValue: '//span[contains(text(), "Total transfer value")]/following-sibling::div/span[contains(.,"£")]',
+    totalPayment: '//span[contains(text(), "Total payments")]/following-sibling::div/span[contains(.,"£")]',
+    latestPayment: '//span[contains(text(), "Latest payment")]/following-sibling::div/span[contains(.,"£")]',
+    investmentGrowth: '//span[contains(text(), "Investment growth")]/following-sibling::div/span[contains(.,"£")]',
+};
+
+
+---
+
+6️⃣ Test Config (testConfig.ts)
+
+export const testUsers = [
+    { username: 'user1', password: 'password1' },
+    { username: 'user2', password: 'password2' }
+];
+
+export const urls = {
+    login: 'https://solsys1.standardlife.com/secure/customer-authentication-client/customer/login',
+    emberDashboard: 'https://main.welcome.standardlife.co.uk/'
+};
+
+
+---
+
+7️⃣ Main Test Spec File (testScenario.e2e.ts)
+
+import { testUsers, urls } from '../testConfig';
+import LoginPage from '../pages/loginPage';
+import DgDashboardPage from '../pages/dgDashboardPage';
+import EmberDashboardPage from '../pages/emberDashboardPage';
+
+describe('End-to-End Ember Dashboard Verification', () => {
+    testUsers.forEach((testUser) => {
+        it(`should log in to Open AM for user ${testUser.username}`, async () => {
+            await LoginPage.openLoginPage(urls.login);
+            await LoginPage.login(testUser.username, testUser.password);
+            await DgDashboardPage.waitForDashboard();
+            
+            const dgDashboardValues = await DgDashboardPage.extractValues();
+            console.log('Values from DG Dashboard:', dgDashboardValues);
+
+            await EmberDashboardPage.openDashboard(urls.emberDashboard);
+            await EmberDashboardPage.waitForDashboard();
+            
+            const emberDashboardValues = await EmberDashboardPage.extractValues();
+            console.log('Values from Ember Dashboard:', emberDashboardValues);
+
+            expect(dgDashboardValues.totalValue).toEqual(emberDashboardValues.totalValue);
+            expect(dgDashboardValues.totalTransferValue).toEqual(emberDashboardValues.totalTransferValue);
+        });
+    });
+});
+
+
+---
+
+✅ Key Improvements
+
+Separated Login, DG Dashboard, and Ember Dashboard for better modularity.
+
+Reusable Selectors to avoid duplicate XPath usage.
+
+Helper functions like waitForDashboard() to ensure page readiness.
+
+Test Users and URLs centralized in testConfig.ts.
+
+
+
+---
+
+🚀 Next Steps
+
+Run the refactored test using:
+
+npx wdio wdio.conf.ts --spec tests/e2e/specs/testScenario.e2e.ts
+
+Let me know if you want additional refinements or enhancements! 🚀
+
+
+
+You're absolutely right! We should first check if the elements are displayed before trying to extract their text values. Otherwise, the test might fail when an expected element is missing.
+
+I'll modify both DgDashboardPage.ts and EmberDashboardPage.ts to safely extract values only if elements exist.
+
+
+---
+
+1️⃣ Updated DG Dashboard Page (dgDashboardPage.ts)
+
+import { expect } from '@wdio/globals';
+import DgDashboardSelectors from '../selectors/dgDashboardSelectors';
+
+class DgDashboardPage {
+    async waitForDashboard() {
+        await expect($(DgDashboardSelectors.totalValue)).toBeDisplayed();
+    }
+
+    async extractValues() {
+        const values: Record<string, string> = {};
+
+        if (await $(DgDashboardSelectors.totalValue).isDisplayed()) {
+            values.totalValue = await $(DgDashboardSelectors.totalValue).getText();
+        }
+
+        if (await $(DgDashboardSelectors.totalTransferValue).isDisplayed()) {
+            values.totalTransferValue = await $(DgDashboardSelectors.totalTransferValue).getText();
+        }
+
+        if (await $(DgDashboardSelectors.growthValue).isDisplayed()) {
+            values.growthValue = await $(DgDashboardSelectors.growthValue).getText();
+        }
+
+        if (await $(DgDashboardSelectors.savingsValue).isDisplayed()) {
+            values.savingsValue = await $(DgDashboardSelectors.savingsValue).getText();
+        }
+
+        if (await $(DgDashboardSelectors.insuranceValue).isDisplayed()) {
+            values.insuranceValue = await $(DgDashboardSelectors.insuranceValue).getText();
+        }
+
+        if (await $(DgDashboardSelectors.taxFreeCashRemaining).isDisplayed()) {
+            values.taxFreeCashRemaining = await $(DgDashboardSelectors.taxFreeCashRemaining).getText();
+        }
+
+        if (await $(DgDashboardSelectors.totalWithdrawValue).isDisplayed()) {
+            values.totalWithdrawValue = await $(DgDashboardSelectors.totalWithdrawValue).getText();
+        }
+
+        return values;
+    }
+}
+
+export default new DgDashboardPage();
+
+
+---
+
+2️⃣ Updated Ember Dashboard Page (emberDashboardPage.ts)
+
+import { expect } from '@wdio/globals';
+import EmberDashboardSelectors from '../selectors/emberDashboardSelectors';
+
+class EmberDashboardPage {
+    async openDashboard(url: string) {
+        await browser.newWindow(url, { type: 'tab' });
+    }
+
+    async waitForDashboard() {
+        await expect($(EmberDashboardSelectors.totalValue)).toBeDisplayed();
+    }
+
+    async extractValues() {
+        const values: Record<string, string> = {};
+
+        if (await $(EmberDashboardSelectors.totalValue).isDisplayed()) {
+            values.totalValue = await $(EmberDashboardSelectors.totalValue).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.totalTransferValue).isDisplayed()) {
+            values.totalTransferValue = await $(EmberDashboardSelectors.totalTransferValue).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.totalPayment).isDisplayed()) {
+            values.totalPayment = await $(EmberDashboardSelectors.totalPayment).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.latestPayment).isDisplayed()) {
+            values.latestPayment = await $(EmberDashboardSelectors.latestPayment).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.investmentGrowth).isDisplayed()) {
+            values.investmentGrowth = await $(EmberDashboardSelectors.investmentGrowth).getText();
+        }
+
+        return values;
+    }
+}
+
+export default new EmberDashboardPage();
+
+
+---
+
+3️⃣ Updated Main Test (testScenario.e2e.ts)
+
+import { testUsers, urls } from '../testConfig';
+import LoginPage from '../pages/loginPage';
+import DgDashboardPage from '../pages/dgDashboardPage';
+import EmberDashboardPage from '../pages/emberDashboardPage';
+
+describe('End-to-End Ember Dashboard Verification', () => {
+    testUsers.forEach((testUser) => {
+        it(`should log in to Open AM for user ${testUser.username}`, async () => {
+            await LoginPage.openLoginPage(urls.login);
+            await LoginPage.login(testUser.username, testUser.password);
+            await DgDashboardPage.waitForDashboard();
+            
+            const dgDashboardValues = await DgDashboardPage.extractValues();
+            console.log('Values from DG Dashboard:', dgDashboardValues);
+
+            await EmberDashboardPage.openDashboard(urls.emberDashboard);
+            await EmberDashboardPage.waitForDashboard();
+            
+            const emberDashboardValues = await EmberDashboardPage.extractValues();
+            console.log('Values from Ember Dashboard:', emberDashboardValues);
+
+            // Compare only values that exist in both dashboards
+            for (const key in dgDashboardValues) {
+                if (emberDashboardValues[key]) {
+                    expect(dgDashboardValues[key]).toEqual(emberDashboardValues[key]);
+                }
+            }
+        });
+    });
+});
+
+
+---
+
+✅ What's Improved?
+
+1. Prevents errors when elements are missing
+
+Each selector now checks isDisplayed() before extracting text.
+
+
+
+2. Avoids storing undefined values
+
+If a selector is missing, it won't be added to the object.
+
+
+
+3. Selective Comparison
+
+The final test only compares values that exist in both dashboards.
+
+
+
+
+
+---
+
+🚀 Next Steps
+
+Run the updated test using:
+
+npx wdio wdio.conf.ts --spec tests/e2e/specs/testScenario.e2e.ts
+
+If there's an issue with missing elements, try debugging by printing:
+
+console.log('DG Values:', dgDashboardValues);
+console.log('Ember Values:', emberDashboardValues);
+
+
+This should now be a fully modular & robust POM setup! Let me know if you need further tweaks 🚀
+
+
+
+
