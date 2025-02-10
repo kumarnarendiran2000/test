@@ -435,4 +435,138 @@ export default {
 
 
 
+export default [
+    {
+        label: 'Look into Money Mindset',
+        shouldOpenNewTab: true,
+        expectedUrlEnding: '/secure/customer-platform/money-mindset-consent',
+        waitForSelector: "//h1[contains(text(),'Money Mindset')]"
+    },
+    {
+        label: 'Top up your pension',
+        shouldOpenNewTab: true,
+        expectedUrlEnding: '/secure/customer-platform/pension/regular',
+        waitForSelector: "//h1[contains(text(),'Pension')]"
+    },
+    {
+        label: 'Manage your pension',
+        shouldOpenNewTab: false,
+        expectedUrlEnding: '/secure/customer-platform/dashboard',
+        waitForSelector: "//h1[contains(text(),'Dashboard Overview')]"
+    }
+];
 
+
+import { waitForElement } from '../utils/helpers';
+import EmberDashboardSelectors from '../selectors/emberDashboardSelectors';
+import ButtonSelectors from '../selectors/buttonSelectors';
+
+class EmberDashboardPage {
+    async openDashboard(url: string) {
+        await browser.newWindow(url, { type: 'tab' });
+    }
+
+    async waitForDashboard() {
+        const managePensionButton = $(EmberDashboardSelectors.managePensionButton);
+        await waitForElement(managePensionButton);
+    }
+
+    async extractValues(): Promise<Record<string, string>> {
+        const values: Record<string, string> = {};
+
+        if (await $(EmberDashboardSelectors.totalValue).isDisplayed()) {
+            values.totalValue = await $(EmberDashboardSelectors.totalValue).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.totalTransferValue).isDisplayed()) {
+            values.totalTransferValue = await $(EmberDashboardSelectors.totalTransferValue).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.totalPayment).isDisplayed()) {
+            values.totalPayment = await $(EmberDashboardSelectors.totalPayment).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.latestPayment).isDisplayed()) {
+            values.latestPayment = await $(EmberDashboardSelectors.latestPayment).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.growthValue).isDisplayed()) {
+            const investmentGrowth = await $(EmberDashboardSelectors.growthValue).getText();
+            values.growthValue = investmentGrowth.includes(' ') ? investmentGrowth.split(' ')[0] : investmentGrowth;
+        }
+
+        if (await $(EmberDashboardSelectors.taxFreeCashRemaining).isDisplayed()) {
+            values.taxFreeCashRemaining = await $(EmberDashboardSelectors.taxFreeCashRemaining).getText();
+        }
+
+        if (await $(EmberDashboardSelectors.totalWithdrawValue).isDisplayed()) {
+            values.totalWithdrawValue = await $(EmberDashboardSelectors.totalWithdrawValue).getText();
+        }
+
+        return values;
+    }
+
+    async navigateAndVerifyButtons(): Promise<void> {
+        const originalWindow = await browser.getWindowHandle();
+
+        for (const button of ButtonSelectors) {
+            const buttonElement = $(`[aria-label='${button.label}']`);
+            await waitForElement(buttonElement);
+            await buttonElement.click();
+
+            if (button.shouldOpenNewTab) {
+                await browser.waitUntil(async () => (await browser.getWindowHandles()).length > 1, { timeout: 10000 });
+
+                const handles = await browser.getWindowHandles();
+                await browser.switchWindow(handles[handles.length - 1]);
+
+                await waitForElement($(button.waitForSelector));
+                expect(await browser.getUrl()).toContain(button.expectedUrlEnding);
+
+                await browser.closeWindow();
+                await browser.switchWindow(originalWindow);
+            } else {
+                await waitForElement($(button.waitForSelector));
+                expect(await browser.getUrl()).toContain(button.expectedUrlEnding);
+            }
+        }
+    }
+}
+
+export default new EmberDashboardPage();
+
+
+import { browser, expect } from '@wdio/globals';
+import { authenticate } from '../utils/authenticate';
+import { testPacks, urls } from '../utils/testConfig';
+import EmberDashboardPage from '../pages/emberDashboardPage';
+
+describe('Validate data across users', () => {
+    before(async () => {
+        await browser.setWindowRect(1920, 0, 1200, 800);
+        await browser.maximizeWindow();
+    });
+
+    testPacks.forEach((testPack) => {
+        describe(`CK: ${testPack.standardlifeId}`, () => {
+            it(`should authenticate and validate values for ${testPack.welcomeName}`, async () => {
+                await EmberDashboardPage.openDashboard(urls.localEmberDashboard);
+                await authenticate(testPack.standardlifeId);
+                await EmberDashboardPage.waitForDashboard();
+
+                const emberDashboardValues = await EmberDashboardPage.extractValues();
+                console.log(`Values from Ember Dashboard for ${testPack.welcomeName}:`, emberDashboardValues);
+
+                for (const key in emberDashboardValues) {
+                    if (testPack.hasOwnProperty(key)) {
+                        expect(testPack[key].toString().trim()).toEqual(emberDashboardValues[key].toString().trim());
+                    }
+                }
+            });
+
+            it('should navigate through buttons and verify URLs', async () => {
+                await EmberDashboardPage.navigateAndVerifyButtons();
+            });
+        });
+    });
+});
