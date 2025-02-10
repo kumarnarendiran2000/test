@@ -632,3 +632,8 @@ it(`should authenticate and validate values for ${testPack.welcomeName}`, async 
         }
     });
 });
+
+
+expect(emberDashboardValues[key]).toEqual(
+    testPack[key as keyof typeof testPack]?.toLocaleString()
+);
