@@ -424,5 +424,15 @@ class LoginPage {
 export default new LoginPage();
 
 
+export default {
+    usernameInput: '#userid',
+    passwordInput: '#password',
+    submitButton: '#submit',
+    otpPageHeading: "//h3[contains(., 'Enter verification code')]",
+    otpInput: '#OTPcode',
+    otpSubmitButton: '#VerifyCode'
+};
+
+
 
 
