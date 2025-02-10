@@ -570,3 +570,22 @@ describe('Validate data across users', () => {
         });
     });
 });
+
+
+async openDashboard(url: string) {
+    const handles = await browser.getWindowHandles(); // Get all current open tabs
+
+    if (handles.length > 1) {
+        // If more than 1 tab is already open, open a new tab for each iteration
+        await browser.newWindow(url, { type: 'tab' });
+    } else {
+        // First iteration: Use browser.url() in the same tab
+        await browser.url(url);
+    }
+
+    // Wait until the page fully loads
+    await browser.waitUntil(
+        async () => (await browser.getTitle()).length > 0,
+        { timeout: 10000, timeoutMsg: 'Page did not load' }
+    );
+}
