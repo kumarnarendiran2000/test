@@ -3,3 +3,176 @@
 //h2[contains(text(), 'Your pension')]/following-sibling::div//p[contains(text(), 'Investment growth')]/following-sibling::span[contains(text(), '£')]
 
 
+To convert your test into a Page Object Model (POM) structure, we need to separate concerns into individual page classes and selectors while keeping the test logic in the spec file. Here's how you can structure it:
+
+
+---
+
+Steps to Convert:
+
+1. Create a TestHarnessPage.ts (Handles CK Number input and selection)
+
+
+2. Update EmberDashboardPage.ts (Already exists, reuse for extracting Ember Dashboard values)
+
+
+3. Create DgDashboardPage.ts (Handles extracting DG Dashboard values)
+
+
+4. Modify the Spec file to call these page methods in a loop for multiple CK numbers
+
+
+
+
+---
+
+1. Create TestHarnessPage.ts
+
+import { waitForElementToBeDisplayed } from '../utils/helpers';
+import testHarnessSelectors from '../selectors/testHarnessSelectors';
+
+class TestHarnessPage {
+    async openTestHarness(url: string): Promise<void> {
+        await browser.url(url);
+    }
+
+    async enterCkNumber(ckNumber: string): Promise<void> {
+        const ckNumberInput = $(testHarnessSelectors.ckNumberInput);
+        await ckNumberInput.setValue(ckNumber);
+    }
+
+    async selectEmberMain(): Promise<void> {
+        const dropdown = $(testHarnessSelectors.dropdown);
+        await waitForElementToBeDisplayed(dropdown);
+        await dropdown.selectByVisibleText('Ember main');
+    }
+
+    async openInNewWindow(): Promise<void> {
+        const newWindowButton = $(testHarnessSelectors.newWindowButton);
+        await newWindowButton.click();
+        const handles = await browser.getWindowHandles();
+        await browser.switchWindow(handles[1]); // Switch to newly opened tab
+    }
+}
+
+export default new TestHarnessPage();
+
+
+---
+
+2. Update EmberDashboardPage.ts
+
+(Already exists, reuse for extracting values)
+
+
+---
+
+3. Create DgDashboardPage.ts
+
+import { waitForElementToBeDisplayed } from '../utils/helpers';
+import dgDashboardSelectors from '../selectors/dgDashboardSelectors';
+
+class DgDashboardPage {
+    async extractValues(): Promise<Record<string, string>> {
+        const values: Record<string, string> = {};
+
+        if (await $(dgDashboardSelectors.totalValue).isDisplayed()) {
+            values.totalValue = await $(dgDashboardSelectors.totalValue).getText();
+        }
+        if (await $(dgDashboardSelectors.investmentGrowth).isDisplayed()) {
+            values.investmentGrowth = await $(dgDashboardSelectors.investmentGrowth).getText();
+        }
+
+        return values;
+    }
+}
+
+export default new DgDashboardPage();
+
+
+---
+
+4. Create testHarnessSelectors.ts
+
+export default {
+    ckNumberInput: "input[name='CKNumber']",
+    dropdown: "select[name='DestEntry']",
+    newWindowButton: "input[value='... in New window']"
+};
+
+
+---
+
+5. Update Spec File testScenario.e2e.ts
+
+import { browser, expect } from '@wdio/globals';
+import testHarnessPage from '../pages/testHarnessPage';
+import emberDashboardPage from '../pages/emberDashboardPage';
+import dgDashboardPage from '../pages/dgDashboardPage';
+import { ckNumbers, urls } from '../utils/testConfig';
+
+describe('End-to-End Ember Dashboard Verification', () => {
+    before(async () => {
+        await browser.setWindowRect(1920, 1080);
+        await browser.maximizeWindow();
+    });
+
+    ckNumbers.forEach((ckNumber) => {
+        it(`should validate Ember and DG Dashboard for CK: ${ckNumber}`, async () => {
+            // Open Test Harness
+            await testHarnessPage.openTestHarness(urls.testHarness);
+            await testHarnessPage.enterCkNumber(ckNumber);
+            await testHarnessPage.selectEmberMain();
+            await testHarnessPage.openInNewWindow();
+
+            // Extract values from Ember Dashboard
+            await emberDashboardPage.waitForDashboard();
+            const emberValues = await emberDashboardPage.extractValues();
+
+            // Open DG Dashboard in new tab
+            await browser.newWindow(urls.dgDashboard);
+            await browser.pause(5000);
+            const dgValues = await dgDashboardPage.extractValues();
+
+            // Compare Values
+            Object.keys(dgValues).forEach((key) => {
+                if (emberValues.hasOwnProperty(key)) {
+                    expect(dgValues[key]).toEqual(emberValues[key]);
+                }
+            });
+
+            console.log('Total values match successfully');
+        });
+    });
+});
+
+
+---
+
+Summary of Changes:
+
+Created TestHarnessPage.ts to handle CK input and window switching.
+
+Updated EmberDashboardPage.ts to be reusable.
+
+Created DgDashboardPage.ts to extract DG Dashboard values.
+
+Refactored the test spec to loop through multiple CK numbers.
+
+Selectors moved to separate files for maintainability.
+
+
+
+---
+
+Outcome:
+
+Your test now follows Page Object Model (POM) best practices.
+
+Each page has its own responsibility.
+
+The test spec only calls the necessary methods, making it cleaner and more readable.
+
+
+Would you like to add any enhancements or adjustments?
+
