@@ -589,3 +589,24 @@ async openDashboard(url: string) {
         { timeout: 10000, timeoutMsg: 'Page did not load' }
     );
 }
+
+async openDashboard(url: string) {
+    const handles = await browser.getWindowHandles(); // Get all open tabs
+    let newHandle: string;
+
+    if (handles.length > 1) {
+        await browser.newWindow(url, { type: 'tab' });
+        const updatedHandles = await browser.getWindowHandles(); // Get handles again
+        newHandle = updatedHandles[updatedHandles.length - 1]; // Get last opened tab
+    } else {
+        await browser.url(url);
+        newHandle = handles[0]; // Default to first tab
+    }
+
+    await browser.switchWindow(newHandle); // Ensure focus is on the correct tab
+
+    await browser.waitUntil(
+        async () => (await browser.getTitle()).length > 0,
+        { timeout: 10000, timeoutMsg: 'Page did not load' }
+    );
+}
