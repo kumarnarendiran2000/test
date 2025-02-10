@@ -176,3 +176,99 @@ The test spec only calls the necessary methods, making it cleaner and more reada
 
 Would you like to add any enhancements or adjustments?
 
+
+Here's the refactored CI pipeline configuration with the correct flow for setting up your frontend, backend mock server, and e2e tests:
+
+Updated CI Pipeline (ci-pipeline.yml)
+
+jobs:
+  integration-test:
+    needs: deps-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Start Backend Mock Servers
+        run: |
+          pnpm --filter back-end serve:mock &
+          pnpm --filter mock-legacy-slal-api serve:local &
+
+      - name: Configure Frontend Environment
+        run: |
+          echo "API_BASE_URL=http://localhost:5000" > .env.local
+          echo "ANOTHER_ENV_VAR=value" >> .env.local
+
+      - name: Start Frontend Server
+        run: pnpm --filter @ember/dashboard web &
+      
+      - name: Wait for Frontend to be Ready
+        run: |
+          for i in {1..30}; do
+            if curl --output /dev/null --silent --head --fail http://localhost:8081; then
+              echo "Frontend is up!"
+              exit 0
+            fi
+            echo "Waiting for frontend to start..."
+            sleep 5
+          done
+          echo "Frontend did not start in time" && exit 1
+
+      - name: Run E2E Tests
+        run: pnpm test:e2e --filter @ember/tests -- spec/e2e/test/pomTestMockData.e2e.ts
+
+
+---
+
+Explanation of Refactored Flow
+
+1. Checkout Repository → Clones the latest code.
+
+
+2. Setup PNPM & Node.js → Ensures the right package manager and runtime.
+
+
+3. Install Dependencies → Installs required project dependencies.
+
+
+4. Start Backend Mock Servers → Runs both backend mock servers in the background (& keeps them running).
+
+
+5. Configure Frontend Environment → Creates a .env.local file with necessary API overrides.
+
+
+6. Start Frontend Server → Runs the frontend (pnpm --filter @ember/dashboard web &).
+
+
+7. Wait for Frontend to be Ready → Checks every 5 seconds (max 2.5 minutes) if the frontend is up before proceeding.
+
+
+8. Run E2E Tests → Executes only the mock data test spec (pomTestMockData.e2e.ts).
+
+
+
+
+---
+
+Why This Works?
+
+Ensures all servers are running before the tests start.
+
+Waits for the frontend instead of using wait-on (since your app requires cookies to be set).
+
+Runs tests in an isolated environment with only one spec file for efficiency.
+
+
+This should now work in your CI pipeline as expected. 🚀
+
+
