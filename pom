@@ -610,3 +610,25 @@ async openDashboard(url: string) {
         { timeout: 10000, timeoutMsg: 'Page did not load' }
     );
 }
+
+
+it(`should authenticate and validate values for ${testPack.welcomeName}`, async () => {
+    await EmberDashboardPage.openDashboard(urls.localEmberDashboard);
+    await authenticate(testPack.standardlifeId);
+    await EmberDashboardPage.waitForDashboard();
+
+    const emberDashboardValues = await EmberDashboardPage.extractValues();
+    console.log(
+        `Values from Ember Dashboard for ${testPack.welcomeName}:`,
+        emberDashboardValues
+    );
+
+    // Dynamically iterate over only matching keys
+    Object.keys(testPack).forEach((key) => {
+        if (emberDashboardValues.hasOwnProperty(key)) {
+            expect(emberDashboardValues[key]).toEqual(
+                testPack[key]?.toLocaleString()
+            );
+        }
+    });
+});
