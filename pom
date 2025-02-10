@@ -402,5 +402,27 @@ console.log('Ember Values:', emberDashboardValues);
 This should now be a fully modular & robust POM setup! Let me know if you need further tweaks 🚀
 
 
+import { ChainablePromiseElement } from 'webdriverio';
+import loginSelectors from '../selectors/loginSelectors';
+
+class LoginPage {
+    async login(username: string, password: string): Promise<void> {
+        await $(loginSelectors.usernameInput).setValue(username);
+        await $(loginSelectors.passwordInput).setValue(password);
+        await $(loginSelectors.submitButton).click();
+    }
+
+    async enterOtpIfPrompted(): Promise<void> {
+        const otpPageHeading = $(loginSelectors.otpPageHeading);
+        if (await otpPageHeading.isDisplayed()) {
+            await $(loginSelectors.otpInput).setValue('000000');
+            await $(loginSelectors.otpSubmitButton).click();
+        }
+    }
+}
+
+export default new LoginPage();
+
+
 
 
