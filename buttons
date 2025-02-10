@@ -73,3 +73,10 @@ await browser.waitUntil(
 );
 
 //img[contains(@class, 'money-img') and contains(@src, 'money-mindset.png')]
+
+
+for (const key in emberDashboardValues) {
+    if (testPack.hasOwnProperty(key)) {
+        expect(testPack[key].toString().trim()).toEqual(emberDashboardValues[key].toString().trim());
+    }
+}
