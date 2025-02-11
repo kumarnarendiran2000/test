@@ -323,3 +323,20 @@ capabilities: [
     },
   },
 ],
+
+
+export const config = {
+  capabilities: [
+    {
+      browserName: 'MicrosoftEdge',
+      'ms:edgeOptions': {
+        args: [
+          '--disable-gpu',
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          process.env.CI ? '--headless' : '', // Only headless in CI
+        ].filter(Boolean),
+      },
+    },
+  ],
+};
