@@ -305,3 +305,21 @@ capabilities: [
 'ms:edgeOptions': {
   args: ['--headless', '--disable-gpu', '--user-data-dir=/tmp/edge-profile'],
 },
+
+const isCI = process.env.CI === 'true';
+
+capabilities: [
+  {
+    browserName: 'MicrosoftEdge',
+    'ms:edgeOptions': {
+      binary: '/usr/bin/microsoft-edge',
+      args: [
+        isCI ? '--headless' : '',
+        '--disable-gpu',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        isCI ? '--user-data-dir=/tmp/edge-profile' : '',
+      ].filter(Boolean), // Removes empty values
+    },
+  },
+],
