@@ -287,3 +287,13 @@ This should now work in your CI pipeline as expected. 🚀
 - name: Run WebDriverIO E2E Test
   run: pnpm test:e2e --spec=tests/e2e/specs/mockdatatest.e2e.ts
 
+
+capabilities: [
+  {
+    browserName: 'MicrosoftEdge',
+    'ms:edgeOptions': {
+      binary: '/usr/bin/microsoft-edge',
+      args: ['--user-data-dir=/tmp/edge-profile', '--no-sandbox', '--disable-dev-shm-usage'],
+    },
+  },
+],
