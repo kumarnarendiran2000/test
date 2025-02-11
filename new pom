@@ -297,3 +297,11 @@ capabilities: [
     },
   },
 ],
+
+
+- name: Cleanup Edge Profile
+  run: rm -rf /tmp/edge-profile
+
+'ms:edgeOptions': {
+  args: ['--headless', '--disable-gpu', '--user-data-dir=/tmp/edge-profile'],
+},
