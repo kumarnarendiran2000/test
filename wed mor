@@ -70,3 +70,22 @@ if (isButtonVisible) {
 } else {
   console.log("Accept Cookies button was not visible, skipping click");
 }
+
+export async function waitForElementIfExists(
+  element: WebdriverIO.Element,
+  timeout = 5000,
+  interval = 500
+): Promise<boolean> {
+  try {
+    return await browser.waitUntil(
+      async () => await element.isDisplayed(),
+      {
+        timeout,
+        interval,
+        timeoutMsg: "Element not displayed within time limit",
+      }
+    );
+  } catch {
+    return false; // Return false instead of failing the test
+  }
+}
