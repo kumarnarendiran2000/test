@@ -5,3 +5,23 @@ describe('My Jest Test Suite', () => {
         expect(title).toBe('Example Domain');
     });
 });
+
+app.get('/secure/customer-platform/logout', async (c) => {
+  const csrfToken = c.req.query('CSRF_TOKEN');
+
+  if (!csrfToken) {
+    throw new HTTPException(400, { message: 'CSRF token is required' });
+  }
+
+  // Return HTML response properly
+  return c.html(`<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Logout</title>
+  </head>
+  <body>
+    <h2>Logout Successful</h2>
+  </body>
+  </html>`);
+});
