@@ -1,0 +1,27 @@
+const handles = await browser.getWindowHandles();
+console.log("Available window handles before switch:", handles);
+
+await browser.switchWindow(handles[handles.length - 1]);
+
+await browser.waitUntil(
+    async () => (await browser.getWindowHandle()) === handles[handles.length - 1],
+    {
+        timeout: 5000,
+        timeoutMsg: 'Window switch did not complete',
+    }
+);
+
+console.log("Switched to handle:", handles[handles.length - 1]);
+console.log("Current URL after switching:", await browser.getUrl());
+
+await browser.waitUntil(
+    async () => {
+        const readyState = await browser.execute(() => document.readyState);
+        console.log("Document Ready State:", readyState);
+        return readyState === 'complete';
+    },
+    {
+        timeout: 15000,
+        timeoutMsg: 'Page did not fully load within the time limit',
+    }
+);
