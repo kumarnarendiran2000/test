@@ -50,3 +50,23 @@ await browser.waitUntil(
   },
   { timeout: 10000, timeoutMsg: 'URL did not stabilize or did not end with expected path' }
 );
+
+const acceptCookiesButton = $(EmberDashboardSelectors.acceptAllCookiesButton);
+
+// Wait for the button to be displayed, but don’t fail if it isn’t
+const isButtonVisible = await browser.waitUntil(
+  async () => await acceptCookiesButton.isDisplayed(),
+  {
+    timeout: 5000, // Wait for max 5 seconds
+    interval: 500, // Check every 500ms
+    timeoutMsg: "Accept Cookies button not displayed in time",
+  }
+).catch(() => false); // Catch timeout errors and return false
+
+// Click only if the button was found and displayed
+if (isButtonVisible) {
+  await acceptCookiesButton.click();
+  console.log("Clicked Accept Cookies");
+} else {
+  console.log("Accept Cookies button was not visible, skipping click");
+}
