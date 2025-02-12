@@ -25,3 +25,11 @@ await browser.waitUntil(
         timeoutMsg: 'Page did not fully load within the time limit',
     }
 );
+
+
+const spinner = $("//img[contains(@src, 'spinner.svg') and @alt='loading']");
+
+await browser.waitUntil(
+  async () => !(await spinner.isDisplayed()),
+  { timeout: 15000, timeoutMsg: 'Spinner did not disappear in time' }
+);
