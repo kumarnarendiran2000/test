@@ -1,0 +1,39 @@
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Backend and Mock-SLAL API servers
+        run: |
+          pnpm --filter back-end serve:mock &
+          pnpm --filter mock-legacy_slal_api serve:local &
+          sleep 5
+
+      - name: Build Frontend (Expo Web)
+        run: |
+          # We set environment variables if needed for the build
+          # e.g. EXPO_PUBLIC_API_URL=http://localhost:3001
+          expo export --platform web
+          # Or with pm2 or something if you want concurrency
+
+      - name: Serve built files
+        # If you don't have serve installed globally or in devDeps, use npx:
+        run: npx serve dist -l 3000 &
+      
+      - name: Wait for server
+        run: sleep 10
+
+      - name: Run E2E Test
+        run: pnpm --filter e2e test
