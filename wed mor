@@ -33,3 +33,20 @@ await browser.waitUntil(
   async () => !(await spinner.isDisplayed()),
   { timeout: 15000, timeoutMsg: 'Spinner did not disappear in time' }
 );
+
+let previousUrl = '';
+await browser.waitUntil(
+  async () => {
+    const currentUrl = await browser.getUrl();
+    
+    // Define the expected sub-URL
+    const expectedSubUrl = "/expected-path"; // Change this based on your case
+
+    // Check if the URL is stable and ends with the expected path
+    if (currentUrl === previousUrl && currentUrl.endsWith(expectedSubUrl)) return true;
+
+    previousUrl = currentUrl;
+    return false;
+  },
+  { timeout: 10000, timeoutMsg: 'URL did not stabilize or did not end with expected path' }
+);
