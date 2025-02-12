@@ -1,0 +1,20 @@
+export async function waitForPageLoadWithRefresh(timeout = 50000, refreshTimeout = 10000) {
+    try {
+        // Wait for the page to fully load within the given timeout
+        await browser.waitUntil(
+            async () => (await browser.execute(() => document.readyState)) === 'complete',
+            { timeout, interval: 500 }
+        );
+    } catch (error) {
+        console.warn(`⚠️ Page did not load in ${timeout / 1000} seconds. Refreshing...`);
+        
+        // Refresh the page
+        await browser.refresh();
+
+        // Wait again after refresh
+        await browser.waitUntil(
+            async () => (await browser.execute(() => document.readyState)) === 'complete',
+            { timeout: refreshTimeout, interval: 500 }
+        );
+    }
+}
