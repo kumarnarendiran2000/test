@@ -472,5 +472,8 @@ Keeps it professional, structured, and concise.
 
 Let me know if this works or if you need more refinements!
 
+//div[contains(@role, 'alert')]//*[name()='svg'] 
+   | //div[contains(@role, 'alert')]//div[contains(text(), "Don't worry if your amount of cover seems odd - It takes time to process payments and withdrawals. Check back after 2 working days.")]
+
 
 
