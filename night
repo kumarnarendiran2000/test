@@ -475,5 +475,24 @@ Let me know if this works or if you need more refinements!
 //div[contains(@role, 'alert')]//*[name()='svg'] 
    | //div[contains(@role, 'alert')]//div[contains(text(), "Don't worry if your amount of cover seems odd - It takes time to process payments and withdrawals. Check back after 2 working days.")]
 
+async verifyAlertBox(): Promise<void> {
+    // Locate the alert box
+    const alertBox = await $("//div[contains(@role, 'alert')]");
+    
+    // Wait for the alert box to be displayed
+    await expect(alertBox).toBeDisplayed();
+
+    // Locate the SVG inside the alert box
+    const alertIcon = await alertBox.$("//*[name()='svg']");
+    
+    // Wait for the SVG icon to be displayed
+    await expect(alertIcon).toBeDisplayed();
+
+    // Locate the text inside the alert box
+    const alertText = await alertBox.$("//div[contains(text(), \"Don't worry if your amount of cover seems odd\")]");
+
+    // Wait for the text to be displayed
+    await expect(alertText).toBeDisplayed();
+}
 
 
