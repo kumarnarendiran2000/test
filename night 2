@@ -1,0 +1,117 @@
+Here's the structured WebdriverIO test approach to verify the full feedback submission flow step-by-step:
+
+
+---
+
+1️⃣ Steps to Automate
+
+1. Click the "Give Feedback" button → Ensure the modal appears.
+
+
+2. Verify modal contains "We’d love your feedback".
+
+
+3. Click the 5-star rating button (Great).
+
+
+4. Enter text "test" in the textarea.
+
+
+5. Click the Send button.
+
+
+6. Verify "Thank you for your feedback" appears.
+
+
+7. Wait 10 seconds and verify the thank you message disappears.
+
+
+
+
+---
+
+2️⃣ WebdriverIO Test Code (Page Object Model - POM)
+
+✅ Selectors (dashboardSelectors.ts)
+
+export default {
+  giveFeedbackButton: "//button[contains(text(), 'Give feedback')]",
+
+  feedbackModal: "//h4[contains(text(), 'We’d love your feedback')]",
+
+  starRatingGreat: "//span[contains(text(), 'Great')]/preceding-sibling::div/button",
+
+  feedbackTextarea: "//textarea[@placeholder='Enter your feedback here']",
+
+  sendFeedbackButton: "//button[@aria-label='Send']",
+
+  thankYouMessage: "//div[contains(text(), 'Thank you for your feedback')]"
+};
+
+
+---
+
+✅ Page Object Method (dashboardPage.ts)
+
+import dashboardSelectors from "../selectors/dashboardSelectors";
+
+class DashboardPage {
+  async submitFeedback(): Promise<void> {
+    // Click 'Give Feedback' button
+    await $(dashboardSelectors.giveFeedbackButton).click();
+    
+    // Verify feedback modal is displayed
+    await expect($(dashboardSelectors.feedbackModal)).toBeDisplayed();
+    
+    // Click 'Great' star rating
+    await $(dashboardSelectors.starRatingGreat).click();
+    
+    // Enter text "test" in feedback textarea
+    await $(dashboardSelectors.feedbackTextarea).setValue("test");
+
+    // Click 'Send' button
+    await $(dashboardSelectors.sendFeedbackButton).click();
+
+    // Verify "Thank you for your feedback" appears
+    await expect($(dashboardSelectors.thankYouMessage)).toBeDisplayed();
+
+    // Wait 10 seconds for modal to disappear
+    await browser.pause(10000);
+
+    // Verify "Thank you" message disappears
+    await expect($(dashboardSelectors.thankYouMessage)).not.toBeDisplayed();
+  }
+}
+
+export default new DashboardPage();
+
+
+---
+
+✅ Test Spec File (dashboard.e2e.ts)
+
+import DashboardPage from "../pages/dashboardPage";
+
+describe("Feedback Submission Test", () => {
+  it("should submit feedback and verify thank you disappears", async () => {
+    await DashboardPage.submitFeedback();
+  });
+});
+
+
+---
+
+3️⃣ Explanation
+
+1. Button Clicks: Clicking "Give Feedback", selecting a rating, and submitting.
+
+
+2. Waiting for Visibility: Ensuring modal, rating, and message visibility before actions.
+
+
+3. Waiting for Disappearance: After submission, the "Thank You" message should disappear in 10 seconds.
+
+
+
+🚀 Now, run your test in WebdriverIO, and it should verify the entire feedback flow! Let me know if you need refinements!
+
