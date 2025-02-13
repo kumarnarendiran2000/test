@@ -314,4 +314,48 @@ This approach keeps everything modular and aligned with your POM structure.
 Would you like any additional refinements?
 
 
+class EmberDashboardPage {
+    async navigateAndVerifyButtons(useMockData = false): Promise<void> {
+        const originalWindow = await browser.getWindowHandle();
+
+        for (const button of buttonSelectors) {
+            const buttonElement = $(`[aria-label='${button.ariaLabel}']`);
+            await expect(buttonElement).toBeDisplayed();
+
+            // If useMockData is true, only click the specific buttons
+            if (useMockData) {
+                if (button.ariaLabel !== 'Find my pensions button' && button.ariaLabel !== 'View Money Mindset Rewards button') {
+                    continue; // Skip clicking other buttons in mock mode
+                }
+            }
+
+            await buttonElement.click();
+
+            if (button.shouldOpenNewTab) {
+                await browser.waitUntil(
+                    async () => (await browser.getWindowHandles()).length > 1,
+                    { timeout: 10000 }
+                );
+
+                const handles = await browser.getWindowHandles();
+                await browser.switchWindow(handles[handles.length - 1]);
+
+                await waitForPageLoadWithRefresh();
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+
+                await browser.closeWindow();
+                await browser.switchWindow(originalWindow);
+            } else {
+                if (button.waitForSelector) {
+                    await waitForElementToBeDisplayed($(button.waitForSelector));
+                }
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+            }
+        }
+    }
+}
+
+export default new EmberDashboardPage();
+
+
 
