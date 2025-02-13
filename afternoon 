@@ -5,3 +5,13 @@
 //div[div[2]/svg and div[3]/button[contains(text(), 'Logout')]]
 
 //div[div[2]//svg and div[3]//button[contains(text(), 'Logout')]]
+
+
+const expectedName = testPack.name;
+const welcomeText = await $('//h1[contains(text(), "Welcome back,")]');
+await expect(welcomeText).toBeDisplayed();
+
+// Extract actual text and validate against testPack.name
+const actualText = await welcomeText.getText();
+const actualName = actualText.replace('Welcome back,', '').trim(); // Extract name part
+expect(actualName).toEqual(expectedName);
