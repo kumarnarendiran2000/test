@@ -40,3 +40,25 @@ async openDashboard(url: string) {
     // Ensure the page is fully loaded
     await waitForPageLoadWithRefresh();
 }
+
+class EmberDashboardPage {
+    hasOpenedNewTab = false; // Track whether a new tab was opened
+
+    async openDashboard(url: string) {
+        const handles = await browser.getWindowHandles();
+
+        if (!this.hasOpenedNewTab) {
+            // First time: Load in the same tab
+            console.warn("First loop: Navigating in the same tab...");
+            await browser.url(url);
+            this.hasOpenedNewTab = true; // Mark that the first round is done
+        } else {
+            // Second time and beyond: Open in a new tab only once
+            console.warn("Second loop onward: Opening a new tab...");
+            await browser.newWindow(url, { type: 'tab' });
+        }
+
+        // Ensure the page is fully loaded
+        await waitForPageLoadWithRefresh();
+    }
+}
