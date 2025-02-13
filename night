@@ -173,3 +173,56 @@ class EmberDashboardPage {
         await waitForPageLoadWithRefresh();
     }
 }
+
+
+To create selectors for this logout confirmation message in your Page Object Model (POM), you can define them in your selectors file and then access them in your page class.
+
+Selectors (e.g., logoutSelectors.ts)
+
+export const logoutSelectors = {
+  logoutMessage: '//pre[contains(text(), "Logout successful")]', // XPath for the logout confirmation message
+  csrfToken: '//pre[contains(text(), "csrfToken")]', // XPath to verify CSRF token presence
+};
+
+Page Object (e.g., LogoutPage.ts)
+
+import { logoutSelectors } from '../selectors/logoutSelectors';
+
+class LogoutPage {
+  async verifyLogoutMessage(): Promise<void> {
+    const message = await $(logoutSelectors.logoutMessage);
+    await message.waitForDisplayed({ timeout: 5000 });
+    expect(await message.getText()).toContain('Logout successful');
+  }
+
+  async verifyCSRFToken(): Promise<void> {
+    const csrfToken = await $(logoutSelectors.csrfToken);
+    await csrfToken.waitForDisplayed({ timeout: 5000 });
+    expect(await csrfToken.getText()).not.toBeNull();
+  }
+}
+
+export default new LogoutPage();
+
+Usage in Spec File (e.g., logout.e2e.ts)
+
+import LogoutPage from '../pages/LogoutPage';
+
+describe('Logout Test', () => {
+  it('should display logout confirmation message', async () => {
+    await LogoutPage.verifyLogoutMessage();
+    await LogoutPage.verifyCSRFToken();
+  });
+});
+
+This ensures that after logout, your test checks for:
+
+1. The logout success message (Logout successful).
+
+
+2. The presence of the CSRF token (to validate API response integrity).
+
+
+
+Let me know if you need refinements!
+
