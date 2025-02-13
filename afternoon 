@@ -18,3 +18,5 @@ expect(actualName).toEqual(expectedName);
 
 
 //div[.//svg and .//button[div[contains(text(), 'Logout')]]]
+
+//div[div/svg and div/button[div[contains(text(), 'Logout')]]]
