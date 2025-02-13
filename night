@@ -498,3 +498,4 @@ async verifyAlertBox(): Promise<void> {
 
 //div[svg and div[.//button[contains(text(), 'Logout')]]]
 
+//div[svg and div/button[contains(text(), 'Logout')]]
