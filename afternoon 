@@ -49,3 +49,5 @@ async function submitFeedback() {
     await sendButton.waitForDisplayed();
     await sendButton.click();
 }
+
+//span[contains(text(),'Great')]/parent::div/preceding-sibling::button
