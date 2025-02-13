@@ -151,3 +151,25 @@ async openDashboard(url: string): Promise<void> {
 
     await waitForPageLoadWithRefresh();
 }
+
+class EmberDashboardPage {
+    // No need for a static class variable, we rely on sessionStorage
+
+    async openDashboard(url: string): Promise<void> {
+        // Retrieve the value from sessionStorage
+        const hasOpenedNewTab = await browser.execute(() => sessionStorage.getItem('hasOpenedNewTab'));
+
+        if (!hasOpenedNewTab) {
+            console.warn("First loop: Navigating in the same tab...");
+            await browser.url(url);
+
+            // Store flag in sessionStorage
+            await browser.execute(() => sessionStorage.setItem('hasOpenedNewTab', 'true'));
+        } else {
+            console.warn("Second loop onward: Opening a new tab...");
+            await browser.newWindow(url, { type: 'tab' });
+        }
+
+        await waitForPageLoadWithRefresh();
+    }
+}
