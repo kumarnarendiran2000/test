@@ -81,3 +81,25 @@ class EmberDashboardPage {
         await waitForPageLoadWithRefresh();
     }
 }
+
+class EmberDashboardPage {
+    private hasClosedBlankTab: boolean = false; // Track if we already closed the blank tab
+
+    async openDashboard(url: string): Promise<void> {
+        const handles = await browser.getWindowHandles();
+
+        if (handles.length === 1 && !this.hasClosedBlankTab) {
+            console.warn("First iteration: Closing WDIO's default blank tab...");
+            await browser.closeWindow();
+            const newHandles = await browser.getWindowHandles();
+            await browser.switchToWindow(newHandles[0]); // Ensure we're on an active tab
+            this.hasClosedBlankTab = true; // Prevent closing the real tab later
+        }
+
+        console.warn("Opening a new tab...");
+        await browser.newWindow(url, { type: 'tab' });
+
+        // Ensure the page is fully loaded
+        await waitForPageLoadWithRefresh();
+    }
+}
