@@ -24,3 +24,28 @@ expect(actualName).toEqual(expectedName);
 //div[.//svg and .//button[div[contains(text(), 'Logout')]]]
 
 //div[div/svg and .//button[div[contains(text(), 'Logout')]]]
+
+
+const fiveStarRating = $("//span[contains(text(),'Great')]");
+await fiveStarRating.waitForDisplayed();
+await fiveStarRating.click();
+
+
+const feedbackTextarea = $("//textarea[@placeholder='Enter your feedback here']");
+await feedbackTextarea.waitForDisplayed();
+await feedbackTextarea.setValue("test");
+
+
+async function submitFeedback() {
+    const fiveStarRating = $("//span[contains(text(),'Great')]");
+    await fiveStarRating.waitForDisplayed();
+    await fiveStarRating.click();
+
+    const feedbackTextarea = $("//textarea[@placeholder='Enter your feedback here']");
+    await feedbackTextarea.waitForDisplayed();
+    await feedbackTextarea.setValue("test");
+
+    const sendButton = $("//button[@aria-label='Send']");
+    await sendButton.waitForDisplayed();
+    await sendButton.click();
+}
