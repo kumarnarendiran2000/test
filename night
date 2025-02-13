@@ -415,5 +415,62 @@ Let me know if you need any more refinements!
 
 
 
+Here's the updated PR description with your additional point about Edge browser automation:
+
+
+---
+
+Description
+
+Implemented WDIO e2e test suite for the web dashboard.
+
+Setup WDIO via pnpm.
+
+Component validations: Covered amount values, buttons, and their clicks, focusing on major interactions as an initial start.
+
+Pulled test data from Mock SLAL server for verification.
+
+Automating via Microsoft Edge for local execution, as only Edge is added in capabilities for now.
+
+Followed Page Object Model (POM) structure:
+
+The spec file calls the page object.
+
+The page object interacts with components using selectors for validation.
+
+
+
+Feature/Issue Validation Testing
+
+Tests performed:
+
+[ ] Logs before change
+
+[ ] Logs after change
+
+
+Checklist
+
+[ ] Added tests to verify the fix/effectiveness
+
+[ ] Code is commented for readability
+
+[ ] Updated relevant documentation
+
+
+
+---
+
+Why This Works Better?
+
+Includes the Edge browser automation detail explicitly.
+
+Clearly states what was validated and how it was structured.
+
+Keeps it professional, structured, and concise.
+
+
+Let me know if this works or if you need more refinements!
+
 
 
