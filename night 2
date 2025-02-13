@@ -115,3 +115,38 @@ describe("Feedback Submission Test", () => {
 
 🚀 Now, run your test in WebdriverIO, and it should verify the entire feedback flow! Let me know if you need refinements!
 
+
+import dashboardSelectors from "../selectors/dashboardSelectors";
+
+class DashboardPage {
+  async submitFeedback(): Promise<void> {
+    // Click 'Give Feedback' button
+    await $(dashboardSelectors.giveFeedbackButton).click();
+    
+    // Verify feedback modal is displayed
+    await expect($(dashboardSelectors.feedbackModal)).toBeDisplayed();
+    
+    // Click 'Great' star rating
+    await $(dashboardSelectors.starRatingGreat).click();
+    
+    // Enter text "test" in feedback textarea
+    await $(dashboardSelectors.feedbackTextarea).setValue("test");
+
+    // Click 'Send' button
+    await $(dashboardSelectors.sendFeedbackButton).click();
+
+    // Verify "Thank you for your feedback" appears
+    await expect($(dashboardSelectors.thankYouMessage)).toBeDisplayed();
+
+    // Wait dynamically for the message to disappear
+    await browser.waitUntil(
+      async () => !(await $(dashboardSelectors.thankYouMessage).isDisplayed()),
+      {
+        timeout: 15000, // Wait up to 15 seconds
+        timeoutMsg: "The 'Thank You' message did not disappear in time."
+      }
+    );
+  }
+}
+
+export default new DashboardPage();
