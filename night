@@ -358,4 +358,62 @@ class EmberDashboardPage {
 export default new EmberDashboardPage();
 
 
+Got it! Here's the refined PR description with that clarification:
+
+
+---
+
+Description
+
+Implemented WDIO e2e test suite for the web dashboard.
+
+Setup WDIO via pnpm.
+
+Component validations: Covered amount values, buttons, and their clicks, focusing on major interactions as an initial start.
+
+Pulled test data from Mock SLAL server for verification.
+
+Followed Page Object Model (POM) structure:
+
+The spec file calls the page object.
+
+The page object interacts with components using selectors for validation.
+
+
+
+Feature/Issue Validation Testing
+
+Tests performed:
+
+[ ] Logs before change
+
+[ ] Logs after change
+
+
+Checklist
+
+[ ] Added tests to verify the fix/effectiveness
+
+[ ] Code is commented for readability
+
+[ ] Updated relevant documentation
+
+
+
+---
+
+Why This Works Better?
+
+Clarifies that validations were focused on major interactions as an initial start.
+
+Concise yet clear explanation of what was covered.
+
+Maintains a professional and structured format.
+
+
+Let me know if you need any more refinements!
+
+
+
+
 
