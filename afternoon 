@@ -15,3 +15,6 @@ await expect(welcomeText).toBeDisplayed();
 const actualText = await welcomeText.getText();
 const actualName = actualText.replace('Welcome back,', '').trim(); // Extract name part
 expect(actualName).toEqual(expectedName);
+
+
+//div[.//svg and .//button[div[contains(text(), 'Logout')]]]
