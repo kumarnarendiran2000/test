@@ -18,3 +18,25 @@ export async function waitForPageLoadWithRefresh(timeout = 50000, refreshTimeout
         );
     }
 }
+
+async openDashboard(url: string) {
+    const handles = await browser.getWindowHandles();
+
+    if (handles.length === 1) {
+        // If only one tab exists, navigate to the URL instead of opening a new one
+        console.warn("Only one tab exists, navigating instead of opening a new tab...");
+        await browser.url(url);
+    } else {
+        // If multiple tabs exist, check if the URL is already open
+        const currentUrl = await browser.getUrl();
+        if (currentUrl !== url) {
+            console.warn("Opening a new tab since the URL is different...");
+            await browser.newWindow(url, { type: 'tab' });
+        } else {
+            console.warn("The correct URL is already open, no new tab needed.");
+        }
+    }
+
+    // Ensure the page is fully loaded
+    await waitForPageLoadWithRefresh();
+}
