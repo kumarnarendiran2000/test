@@ -226,3 +226,92 @@ This ensures that after logout, your test checks for:
 
 Let me know if you need refinements!
 
+
+Yes, that approach is solid and aligns well with your Page Object Model (POM) structure. Here’s how you can structure it in your selectors, page, and spec file to keep it modular and maintainable.
+
+
+---
+
+1. Update Selectors File (EmberDashboardSelectors.ts)
+
+Define selectors for logout verification.
+
+const EmberDashboardSelectors = {
+    logoutButton: '//button[div[contains(text(),"Logout")]]', // Your refined XPath
+    logoutMessage: 'pre', // Assuming JSON response appears in <pre> tag
+};
+
+export default EmberDashboardSelectors;
+
+
+---
+
+2. Update Page Object File (EmberDashboardPage.ts)
+
+Modify the logoutDashboard method to:
+
+Click the logout button.
+
+Wait for the logout success message.
+
+Validate the URL contains /logout.
+
+Verify both the message and CSRF token.
+
+
+import EmberDashboardSelectors from '../selectors/EmberDashboardSelectors';
+
+class EmberDashboardPage {
+    async logoutDashboard(): Promise<void> {
+        const logoutButton = $(EmberDashboardSelectors.logoutButton);
+        await logoutButton.waitForDisplayed({ timeout: 5000 });
+        await logoutButton.click();
+
+        // Wait until logout message appears
+        const logoutMessage = $(EmberDashboardSelectors.logoutMessage);
+        await logoutMessage.waitForDisplayed({ timeout: 5000 });
+
+        // Verify URL contains '/logout'
+        await browser.waitUntil(
+            async () => (await browser.getUrl()).includes('/secure/customer-platform/logout'),
+            { timeout: 10000, timeoutMsg: 'Did not navigate to logout page' }
+        );
+
+        // Extract and validate logout JSON response
+        const messageText = await logoutMessage.getText();
+        const jsonResponse = JSON.parse(messageText);
+
+        expect(jsonResponse.message).toBe('Logout successful');
+        expect(jsonResponse).toHaveProperty('csrfToken'); // Ensure CSRF token exists
+    }
+}
+
+export default new EmberDashboardPage();
+
+
+---
+
+3. Update Your Spec File (emberDashboardWithMockData.e2e.ts)
+
+Call the logoutDashboard() method inside your test case.
+
+it('should logout the dashboard successfully', async () => {
+    await EmberDashboardPage.logoutDashboard();
+});
+
+
+---
+
+Final Flow
+
+✔ Click Logout Button
+✔ Wait for Logout Success Message
+✔ Verify URL contains /logout
+✔ Validate JSON message and CSRF token
+
+This approach keeps everything modular and aligned with your POM structure.
+
+Would you like any additional refinements?
+
+
+
