@@ -62,3 +62,22 @@ class EmberDashboardPage {
         await waitForPageLoadWithRefresh();
     }
 }
+
+class EmberDashboardPage {
+    async openDashboard(url: string): Promise<void> {
+        const handles = await browser.getWindowHandles();
+
+        if (handles.length === 1) {
+            console.warn("Only one tab exists (probably WDIO blank page). Closing it...");
+            await browser.closeWindow(); // Close the default blank tab
+            const newHandles = await browser.getWindowHandles();
+            await browser.switchToWindow(newHandles[0]); // Ensure we're on an active tab
+        }
+
+        console.warn("Opening a new tab...");
+        await browser.newWindow(url, { type: 'tab' });
+
+        // Ensure the page is fully loaded
+        await waitForPageLoadWithRefresh();
+    }
+}
