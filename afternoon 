@@ -53,3 +53,6 @@ async function submitFeedback() {
 //span[contains(text(),'Great')]/parent::div/preceding-sibling::button
 
 //span[contains(text(),'Great')]/ancestor::div/preceding-sibling::button
+
+
+//span[contains(text(),'Great')]/preceding-sibling::div/button
