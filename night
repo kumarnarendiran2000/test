@@ -118,3 +118,21 @@ async openDashboard(url: string): Promise<void> {
 
     await waitForPageLoadWithRefresh();
 }
+
+class EmberDashboardPage {
+    private static hasOpenedNewTab: boolean = false; // Static so it persists across function calls
+
+    async openDashboard(url: string): Promise<void> {
+        if (!EmberDashboardPage.hasOpenedNewTab) {
+            console.warn("First loop: Navigating in the same tab...");
+            await browser.url(url);
+            EmberDashboardPage.hasOpenedNewTab = true; // Set true so next call opens a new tab
+        } else {
+            console.warn("Second loop onward: Opening a new tab...");
+            await browser.newWindow(url, { type: 'tab' });
+        }
+
+        // Ensure the page is fully loaded
+        await waitForPageLoadWithRefresh();
+    }
+}
