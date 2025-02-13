@@ -3,3 +3,5 @@
 //div[div/svg and div/button/div[contains(text(), 'Logout')]]
 
 //div[div[2]/svg and div[3]/button[contains(text(), 'Logout')]]
+
+//div[div[2]//svg and div[3]//button[contains(text(), 'Logout')]]
