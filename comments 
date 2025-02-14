@@ -1,2 +1,25 @@
 I have multiple test packs because different scenarios have different total values and contribution elements. For example, some have "Total Transfer Value" instead of "Transfer Value," and sole employees might have "Total Cash Free Plan" and "Total Net Withdrawal," which others don’t. To ensure we cover all these variations properly, I set up multiple test packs.
 
+
+Keeping the selectors separate just makes it easier to manage changes later. Even if they're only used in the dashboard page now, having them in one place helps quickly find and update them if something changes. It also keeps things a bit more organized instead of mixing everything in the test files.
+
+Here's a refined response incorporating this additional point:
+
+
+---
+
+I agree with your point, and I explored multiple ways to handle this. Implementing test IDs would have been the most effective approach for selecting elements reliably, but since test IDs were not introduced in the component, I had to rely on dynamic XPath selection.
+
+For other major buttons, we were able to use aria-label or roles like alert, making the selection more structured. However, these text elements did not have a common attribute to leverage, which made selection more challenging.
+
+Given this constraint, I opted for a path-based selection approach to interact with these elements. If the requirement is to avoid web elements entirely, we can refine the selection to use only text and path-based identification, such as:
+//*[contains(text(), 'Total value')]/following-sibling::*[1]//*[1]
+
+This avoids relying on specific web elements but remains tightly coupled to the structure. Let me know if this works or if you have other suggestions!
+
+
+---
+
+This keeps the explanation clear and professional while justifying the approach based on constraints. Let me know if you'd like any refinements!
+
+
