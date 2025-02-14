@@ -23,3 +23,13 @@ This avoids relying on specific web elements but remains tightly coupled to the 
 This keeps the explanation clear and professional while justifying the approach based on constraints. Let me know if you'd like any refinements!
 
 
+"Using an object with functions worked fine, but I went with the class approach to match the POM model. This way, we can instantiate the class and maintain state persistence throughout, which isn’t as straightforward with just an object. It also helps manage things like hasOpenedNewTab more effectively."
+
+This keeps it simple while explaining why you stuck with the class. Let me know if you need tweaks!
+
+
+
+"I used a class to match the Page Object Model (POM) pattern, which helps keep things organized and allows state persistence. This makes it easier to track things like whether a new tab was opened. It’s not a blocker—we could do it with just an object of functions too—but went with this for better structure. Let me know what you think or if you have any suggestions!"
+
+
+
