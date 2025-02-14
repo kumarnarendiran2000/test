@@ -45,3 +45,51 @@ class EmberDashboardPage {
         }
     }
 }
+
+If you want to select the amount value (£179,090) without relying on specific web elements like div, span, or class names, you can use text-based XPath or ARIA attributes (if available).
+
+Approaches to Select the Amount
+
+1️⃣ Text-Based XPath (Without Using Elements Directly)
+
+If the amount always follows a specific label like "Total value", you can use:
+
+//*[contains(text(), 'Total value')]/following-sibling::*[1]
+
+✅ This finds any element that contains "Total value" and selects the next sibling, which is likely the amount.
+
+2️⃣ Using Parent-Child Structure (Without Element Type)
+
+If you know the amount is inside a known section, but don’t want to rely on specific div or span elements:
+
+//*[contains(text(), 'Your pension')]/following::*[contains(text(), '£')]
+
+✅ This finds "Your pension" and then looks forward for any element that contains "£" (amounts typically start with £).
+
+3️⃣ Using ARIA Labels or Data Attributes
+
+Check if the amount has an accessible name:
+
+Look for attributes like aria-label, data-*, or role
+
+Example XPath:
+
+//*[@aria-label='Total value']
+
+✅ This is preferred if available, as it’s more stable than text-based XPath.
+
+
+Which One Should You Use?
+
+1. Check for ARIA attributes (aria-label, role) → Best for accessibility & stability.
+
+
+2. Use text-based XPath (contains(text(), 'Total value')/following-sibling::*[1]) → If ARIA is not available.
+
+
+3. Avoid class names or deep structures since they may change over time.
+
+
+
+Would you like to verify this in your test? 🚀
+
