@@ -1,0 +1,47 @@
+class EmberDashboardPage {
+    async navigateAndVerifyButtons(mockData = false): Promise<void> {
+        const originalWindow = await browser.getWindowHandle();
+
+        for (const button of buttonSelectors) {
+            const buttonElement = $(`[aria-label='${button.ariaLabel}']`);
+            await waitForElementToBeDisplayed(buttonElement);
+
+            // Skip clicks for specific buttons in mock mode
+            if (mockData && ['Find my pensions button', 'View Money Mindset Rewards button'].includes(button.ariaLabel)) {
+                continue;
+            }
+
+            await buttonElement.click();
+
+            // If button is Provider Details, handle expansion + anchor click
+            if (button.ariaLabel === 'Provider Details') {
+                const providerInfoLink = $("a[title*='Find out more information']");
+                await waitForElementToBeDisplayed(providerInfoLink);
+                await providerInfoLink.click();
+            }
+
+            // Common logic for handling new tabs
+            if (button.shouldOpenNewTab || button.ariaLabel === 'Provider Details') {
+                await browser.waitUntil(
+                    async () => (await browser.getWindowHandles()).length > 1,
+                    { timeout: 10000 }
+                );
+
+                const handles = await browser.getWindowHandles();
+                await browser.switchWindow(handles[handles.length - 1]);
+
+                await waitForPageLoadWithRefresh();
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+
+                await browser.closeWindow();
+                await browser.switchWindow(originalWindow);
+            } else {
+                // Verification for buttons that do not open a new tab
+                if (button.waitForSelector) {
+                    await waitForElementToBeDisplayed($(button.waitForSelector));
+                }
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+            }
+        }
+    }
+}
