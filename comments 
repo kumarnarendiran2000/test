@@ -32,4 +32,12 @@ This keeps it simple while explaining why you stuck with the class. Let me know 
 "I used a class to match the Page Object Model (POM) pattern, which helps keep things organized and allows state persistence. This makes it easier to track things like whether a new tab was opened. It’s not a blocker—we could do it with just an object of functions too—but went with this for better structure. Let me know what you think or if you have any suggestions!"
 
 
+Sure! Here's a simple and polite response for your PR comment:
+
+"I looked into this and found that WebdriverIO primarily supports describe and it blocks, especially with Mocha and Jasmine. While we can alias it to test, there's no built-in support for using test directly. Let me know if you think it's worth exploring further!"
+
+This keeps it professional yet conversational. Let me know if you want any tweaks!
+
+
+
 
