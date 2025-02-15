@@ -1,0 +1,46 @@
+name: e2e-test
+needs: deps-check
+runs-on: ubuntu-latest
+
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Setup pnpm
+    uses: ./.github/actions/setup-pnpm
+
+  - name: Setup Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: 20
+
+  - name: Install dependencies
+    run: pnpm install
+
+  # Add a step here to create .env.development.local
+  - name: Create .env.development.local
+    run: |
+      echo "EXPO_PUBLIC_LOCAL_RUN_API_BASE=http://localhost:3000" >> apps/dashboard/.env.development.local
+      # If you have sensitive info, pull it from GitHub Secrets, e.g.:
+      # echo "SECRET_TOKEN=${{ secrets.SECRET_TOKEN }}" >> apps/dashboard/.env.development.local
+
+  - name: Run Backend and Mock-SLAL API servers
+    run: |
+      pnpm --filter back-end serve:mock &
+      pnpm --filter mock-legacy-slal-api serve:local &
+
+  - name: Run Frontend (Expo Web) # via Turbo
+    run: |
+      pnpm turbo run web --filter @ember/dashboard &
+  
+  - name: Wait for server
+    run: sleep 250
+
+  - name: Run Frontend (Expo Web) # or start again if needed
+    run: |
+      pnpm --filter @ember/dashboard web &
+  
+  - name: Wait for server
+    run: sleep 250
+
+  - name: Run E2E Test
+    run: pnpm --filter e2e test:e2e:mock
