@@ -346,3 +346,5 @@ jobs:
 
 //button[@role='button'][contains(., 'Provider details')]
 
+//*[@role='button' and @aria-label='Provider details']
+
