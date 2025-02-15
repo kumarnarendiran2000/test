@@ -344,4 +344,5 @@ jobs:
 
 //a[@role='link'][contains(., 'Find out more information')]
 
+//button[@role='button'][contains(., 'Provider details')]
 
