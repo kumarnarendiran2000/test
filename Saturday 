@@ -147,3 +147,96 @@ This setup ensures you can easily switch between CI/CD mode (headless) and local
 
 Would this approach work for your case? 🚀
 
+
+If you want another way without using process.env, you can modify the wdio.conf.ts to dynamically pick capabilities based on a flag passed via the CLI arguments.
+
+
+---
+
+Solution: Use CLI Arguments (--headless)
+
+Instead of using environment variables, WebdriverIO allows you to pass custom arguments via CLI, which can be accessed inside wdio.conf.ts using process.argv.
+
+Modify wdio.conf.ts
+
+Update the WebdriverIO config file to check for --headless in the command:
+
+const isHeadless = process.argv.includes('--headless');
+
+export const config: WebdriverIO.Config = {
+  maxInstances: 10,
+
+  capabilities: isHeadless ? [
+    {
+      browserName: 'MicrosoftEdge',
+      'ms:edgeOptions': {
+        args: ['--headless']
+      }
+    },
+    {
+      browserName: 'chrome',
+      'goog:chromeOptions': {
+        args: ['--headless']
+      }
+    },
+    {
+      browserName: 'firefox',
+      'moz:firefoxOptions': {
+        args: ['--headless']
+      }
+    }
+  ] : [
+    {
+      browserName: 'MicrosoftEdge'
+    }
+  ],
+
+  // Other configurations...
+};
+
+
+---
+
+How to Use It
+
+Now, instead of using environment variables, you can pass --headless as a flag when running WebdriverIO:
+
+Run in Headless Mode
+
+npx wdio run wdio.conf.ts --headless
+
+Run in UI Mode (without headless)
+
+npx wdio run wdio.conf.ts
+
+
+---
+
+Alternative: Use Scripts in package.json
+
+Modify your package.json:
+
+"scripts": {
+  "test:headless": "npx wdio run wdio.conf.ts --headless",
+  "test:ui": "npx wdio run wdio.conf.ts"
+}
+
+Run:
+
+pnpm run test:headless  # Runs in headless mode
+pnpm run test:ui        # Runs with UI
+
+
+---
+
+Why is This Better?
+
+✅ No need to set environment variables.
+✅ Works cross-platform without set or $env: issues.
+✅ Uses a simple CLI argument that integrates smoothly with WebdriverIO.
+✅ Can add more flags like --debug, --slow, etc., in the future.
+
+Let me know if you need more tweaks! 🚀
+
+
+
