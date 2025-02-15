@@ -44,3 +44,106 @@ steps:
 
   - name: Run E2E Test
     run: pnpm --filter e2e test:e2e:mock
+
+
+If you want to modify the scripts in package.json to have two different test execution modes (headless and normal UI mode), here’s how you can do it.
+
+
+---
+
+1. Modify package.json Scripts
+
+In package.json, add these two scripts:
+
+"scripts": {
+  "test:headless": "USE_HEADLESS=true npx wdio run wdio.conf.ts",
+  "test:ui": "USE_HEADLESS=false npx wdio run wdio.conf.ts"
+}
+
+test:headless: Runs the test in headless mode (for CI).
+
+test:ui: Runs the test in normal mode with UI (for local debugging).
+
+
+
+---
+
+2. Modify wdio.conf.ts
+
+Now, update wdio.conf.ts to use the USE_HEADLESS flag:
+
+export const config: WebdriverIO.Config = {
+    maxInstances: 10,
+    
+    capabilities: process.env.USE_HEADLESS === 'true' ? [
+        {
+            browserName: 'MicrosoftEdge',
+            'ms:edgeOptions': {
+                args: ['--headless'],
+            }
+        },
+        {
+            browserName: 'chrome',
+            'goog:chromeOptions': {
+                args: ['--headless'],
+            }
+        },
+        {
+            browserName: 'firefox',
+            'moz:firefoxOptions': {
+                args: ['--headless'],
+            }
+        }
+    ] : [
+        {
+            browserName: 'MicrosoftEdge'
+        }
+    ],
+
+    // Other configurations...
+};
+
+
+---
+
+3. Running the Tests
+
+Now, you can execute tests in two different modes:
+
+✅ Run in Headless Mode (CI/CD):
+
+npm run test:headless
+
+✅ Run in UI Mode (Local Debugging):
+
+npm run test:ui
+
+
+---
+
+Alternative: Running Directly with Flags
+
+If you don’t want to modify package.json, you can directly pass the flag in the terminal:
+
+USE_HEADLESS=true npx wdio run wdio.conf.ts  # Runs in headless mode
+USE_HEADLESS=false npx wdio run wdio.conf.ts # Runs in normal UI mode
+
+
+---
+
+What Changes Were Made?
+
+Added USE_HEADLESS as a flag to determine which capabilities to use.
+
+Updated wdio.conf.ts to switch between headless and normal mode dynamically.
+
+Created two npm scripts so you don’t have to manually set the flag every time.
+
+
+
+---
+
+This setup ensures you can easily switch between CI/CD mode (headless) and local debugging mode (UI).
+
+Would this approach work for your case? 🚀
+
