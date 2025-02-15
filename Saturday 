@@ -279,6 +279,33 @@ This approach is recommended unless you need multiple functions from fs. 🚀
 const safeTimestamp = new Date().toISOString().replace(/:/g, '-').replace('T', '_').replace('Z', '');
 const screenShotPath = join(__dirname, `../screenshots/${status}/${testName}_${safeTimestamp}.png`);
 
+import { existsSync, rmSync, mkdirSync } from 'fs';
+import { join } from 'path';
+
+onPrepare: function (config, capabilities) {
+    console.log('Preparing for end-to-end test execution...');
+
+    const screenshotDir = join(__dirname, '../screenshots');
+    const directories = [
+        join(screenshotDir, 'success'),
+        join(screenshotDir, 'failure'),
+    ];
+
+    // ✅ Delete existing screenshots folders before test execution
+    directories.forEach((dir) => {
+        if (existsSync(dir)) {
+            console.log(`Deleting old screenshots in: ${dir}`);
+            rmSync(dir, { recursive: true, force: true }); // Deletes the folder and its contents
+        }
+    });
+
+    // ✅ Recreate the folders fresh for each run
+    directories.forEach((dir) => {
+        mkdirSync(dir, { recursive: true });
+    });
+
+    console.log('Setup is completed: Logs and Screenshot directories are fresh.');
+}
 
 
 
