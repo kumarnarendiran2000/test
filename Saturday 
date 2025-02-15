@@ -276,6 +276,10 @@ Why This is Better?
 This approach is recommended unless you need multiple functions from fs. 🚀
 
 
+const safeTimestamp = new Date().toISOString().replace(/:/g, '-').replace('T', '_').replace('Z', '');
+const screenShotPath = join(__dirname, `../screenshots/${status}/${testName}_${safeTimestamp}.png`);
+
+
 
 
 
