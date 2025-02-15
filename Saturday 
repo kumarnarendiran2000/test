@@ -239,4 +239,43 @@ Why is This Better?
 Let me know if you need more tweaks! 🚀
 
 
+Yes, it's a good practice to import only the required functions from fs instead of using import * as fs. This keeps the code cleaner and slightly improves performance by not loading unnecessary modules.
+
+Optimized Import:
+
+Instead of:
+
+import * as fs from 'fs';
+
+Use:
+
+import { existsSync, mkdirSync } from 'fs';
+
+Updated Function:
+
+onPrepare: function (): void {
+    console.log('Preparing for end-to-end test execution...');
+
+    const directories: string[] = ['./logs', './screenshots/success', './screenshots/failure'];
+
+    directories.forEach((dir: string) => {
+        if (!existsSync(dir)) {
+            mkdirSync(dir, { recursive: true });
+        }
+    });
+
+    console.log('Setup completed: Logs and Screenshot directories are ready.');
+}
+
+Why This is Better?
+
+✅ Reduces memory footprint by importing only what's needed.
+✅ Improves readability and maintainability.
+✅ Keeps it more aligned with best practices in TypeScript.
+
+This approach is recommended unless you need multiple functions from fs. 🚀
+
+
+
+
 
