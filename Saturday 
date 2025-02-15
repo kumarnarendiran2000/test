@@ -307,6 +307,40 @@ onPrepare: function (config, capabilities) {
     console.log('Setup is completed: Logs and Screenshot directories are fresh.');
 }
 
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run E2E Tests
+        run: pnpm run test:ui # Update with your test script
+
+      - name: Upload Screenshots as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: tests/e2e/screenshots # Update this path to match your screenshots folder
+          retention-days: 7 # Keep screenshots for 7 days
 
 
 
