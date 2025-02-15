@@ -342,5 +342,6 @@ jobs:
           path: tests/e2e/screenshots # Update this path to match your screenshots folder
           retention-days: 7 # Keep screenshots for 7 days
 
+//a[@role='link'][contains(., 'Find out more information')]
 
 
