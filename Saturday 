@@ -348,3 +348,104 @@ jobs:
 
 //*[@role='button' and @aria-label='Provider details']
 
+
+That sounds like a better approach—keeping selectors directly in the selectors object instead of relying on linkText. Here’s how we can structure it:
+
+
+---
+
+1️⃣ Updated Footer Link Selectors
+
+Instead of storing linkText, we'll use role='link' along with a more direct selector.
+
+export const footerLinkSelectors = [
+  {
+    selector: "//a[@role='link' and contains(text(), 'Contact Us')]",
+    expectedUrlContains: '/contact-us',
+    waitForSelector: "//h1[contains(text(), 'Contact Us')]"
+  },
+  {
+    selector: "//a[@role='link' and contains(text(), 'FAQs')]",
+    expectedUrlContains: '/faqs',
+    waitForSelector: "//h1[contains(text(), 'Frequently Asked Questions')]"
+  },
+  {
+    selector: "//a[@role='link' and contains(text(), 'ScamSmart')]",
+    expectedUrlContains: '/scamsmart',
+    waitForSelector: "//h1[contains(text(), 'ScamSmart')]"
+  },
+  {
+    selector: "//a[@role='link' and contains(text(), 'Find out more information')]",
+    expectedUrlContains: '/find-out-more',
+    waitForSelector: "//h1[contains(text(), 'More Information')]"
+  }
+];
+
+
+---
+
+2️⃣ Function to Click and Validate Footer Links
+
+Since each link has a direct selector, we no longer need to dynamically find elements by text.
+
+async function navigateAndVerifyFooterLinks() {
+  for (const link of footerLinkSelectors) {
+    const linkElement = await $(link.selector);
+    await linkElement.waitForDisplayed();
+    await linkElement.click();
+
+    // Handle new tab
+    await browser.waitUntil(async () => (await browser.getWindowHandles()).length > 1, { timeout: 5000 });
+    const handles = await browser.getWindowHandles();
+    await browser.switchWindow(handles[handles.length - 1]);
+
+    // Wait for the expected element in the new tab
+    await $(link.waitForSelector).waitForDisplayed();
+    expect(await browser.getUrl()).toContain(link.expectedUrlContains);
+
+    // Close the new tab and switch back
+    await browser.closeWindow();
+    await browser.switchWindow(handles[0]);
+  }
+}
+
+
+---
+
+3️⃣ Helper to Expand 'Provider Details'
+
+This ensures "Find out more information" is available before calling navigateAndVerifyFooterLinks().
+
+async function expandProviderDetailsAndClick() {
+  const providerDetailsButton = await $("//button[@role='button' and contains(text(), 'Provider details')]");
+  await providerDetailsButton.waitForDisplayed();
+  await providerDetailsButton.click();
+
+  // Wait for "Find out more information" link to appear
+  const findOutMoreLink = await $(footerLinkSelectors.find(link => link.expectedUrlContains === '/find-out-more')?.selector);
+  await findOutMoreLink.waitForDisplayed();
+}
+
+
+---
+
+4️⃣ Final Function to Run Both
+
+async function testFooterLinks() {
+  await expandProviderDetailsAndClick();
+  await navigateAndVerifyFooterLinks();
+}
+
+
+---
+
+Changes & Benefits:
+
+✅ Moved selectors directly inside footerLinkSelectors.
+✅ No longer relying on linkText, using role-based selectors instead.
+✅ Cleaner helper function to ensure "Find out more information" is visible.
+✅ Modular structure, making it easy to add/remove links.
+
+This should be more optimized. 🚀 Let me know if any tweaks are needed!
+
+
