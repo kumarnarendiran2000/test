@@ -232,3 +232,107 @@ Why This Works?
 
 Let me know if you need more refinements! 🚀
 
+
+Based on the first image (best practices for test descriptions), here’s how you can refactor your describe and it blocks to be more meaningful and aligned with good testing practices:
+
+Issues to Address:
+
+1. Avoid using "should" – Instead, describe what the test does explicitly.
+
+
+2. More meaningful descriptions – Avoid generic descriptions like CK: standardLifeId.
+
+
+3. Break tests into logical sections – Use multiple describe blocks instead of nesting everything under one.
+
+
+
+
+---
+
+Refactored Test Suite Structure
+
+Here’s how you can restructure your tests to follow best practices:
+
+describe('User Dashboard Tests', () => {
+    before(async () => {
+        await browser.maximizeWindow();
+    });
+
+    describe('Authentication & Initial Load', () => {
+        testPacks.forEach((testPack) => {
+            it(`logs in and loads the dashboard for ${testPack.welcomeName}`, async () => {
+                await DashboardScreen.openDashboard(urls.localDevEmberDashboard);
+                await authenticate(testPack.standardLifeId);
+                await DashboardScreen.acceptAllCookies();
+                await DashboardScreen.waitForDashboard();
+            });
+        });
+    });
+
+    describe('Data Verification', () => {
+        testPacks.forEach((testPack) => {
+            it(`validates dashboard values for ${testPack.welcomeName}`, async () => {
+                const extractedValues = await DashboardScreen.extractValues();
+                console.log(`Dashboard Data for ${testPack.welcomeName}:`, extractedValues);
+
+                Object.keys(testPack).forEach((key) => {
+                    if (extractedValues.hasOwnProperty(key)) {
+                        expect(extractedValues[key]).toEqual(testPack[key].toLocaleString());
+                    }
+                });
+            });
+
+            it(`verifies alert box visibility for ${testPack.welcomeName}`, async () => {
+                await DashboardScreen.verifyAlertBox();
+            });
+        });
+    });
+
+    describe('Dashboard Interactions', () => {
+        it('submits feedback and verifies message disappears', async () => {
+            await DashboardScreen.submitFeedback();
+        });
+
+        it('navigates through dashboard buttons', async () => {
+            await DashboardScreen.navigateAndVerifyButtons(true);
+        });
+
+        it('logs out from the dashboard successfully', async () => {
+            await DashboardScreen.logoutDashboard();
+        });
+    });
+});
+
+
+---
+
+Why This Refactoring is Better?
+
+✅ More Descriptive Test Names
+
+Instead of vague "should verify values," it now states "validates dashboard values for Test User".
+
+
+✅ Organized Test Sections
+
+Authentication & Load: Logs in and loads the dashboard.
+
+Data Verification: Extracts and checks values, validates alerts.
+
+Dashboard Interactions: Button clicks, feedback submission, logout.
+
+
+✅ Reduces Redundant Calls
+
+The login & authentication is handled once per user inside a loop.
+
+Buttons are only verified once.
+
+
+This will increase test clarity, improve debugging, and reduce execution time.
+
+Would you like any further adjustments?
+
+
+
