@@ -114,3 +114,42 @@ static async navigateAndVerifyButtons(mockData = false): Promise<void> {
         }
     }
 }
+
+static async navigateAndVerifyButtons(mockData = false): Promise<void> {
+    const originalWindow = await browser.getWindowHandle();
+
+    // Filter out items if mockData is true
+    const filteredButtons = dashboardButtonSelectors.filter(
+        (button) => !(mockData && (button.ariaLabel === 'Find_my_pensions_button' || button.ariaLabel === 'View_Money_Mindset_Rewards_button'))
+    );
+
+    await Promise.all(
+        filteredButtons.map(async (button) => {
+            const buttonElement = await $(`[aria-label='${button.ariaLabel}']`);
+            await waitForElementToBeDisplayed(buttonElement);
+            await buttonElement.click();
+
+            if (button.shouldOpenNewTab) {
+                await browser.waitUntil(async () => (await browser.getWindowHandles()).length > 1, { timeout: 10000 });
+
+                const handles = await browser.getWindowHandles();
+                await browser.switchWindow(handles[handles.length - 1]);
+                await waitForPageLoadWithRefresh();
+
+                if (button.waitForSelector) {
+                    await waitForElementToBeDisplayed($(button.waitForSelector));
+                }
+
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+                await browser.closeWindow();
+                await browser.switchWindow(originalWindow);
+            } else {
+                if (button.waitForSelector) {
+                    await waitForElementToBeDisplayed($(button.waitForSelector));
+                }
+
+                expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+            }
+        })
+    );
+}
