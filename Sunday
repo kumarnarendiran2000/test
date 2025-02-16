@@ -1,0 +1,58 @@
+Based on our discussion, here’s a summary of the issue and some potential solutions:
+
+The Issue:
+When running the same URL in a loop with different data, the tests sometimes experience collisions—the button clicks, and the new tab that should open gets stuck loading. Using browser.reloadSession() has helped reset state, but it's causing slowness and multiple listener warnings.
+
+What’s Happening:
+
+Data Collisions & Caching: The same URL is being loaded repeatedly with different data, and the browser/session might be caching or reusing old data.
+
+New Tab Issues: Opening new tabs in a loop can sometimes lead to the new window not fully initializing, which causes the page to hang.
+
+Reloading Session: While it resets everything, it’s a heavy operation that also adds extra event listeners each time a session is reloaded, leading to warnings and overall slower execution.
+
+
+Potential Alternatives:
+
+1. Clear Cookies & Storage Instead of Reloading Session:
+Instead of reloading the whole session, you can clear cookies, local storage, and session storage before each iteration. For example:
+
+await browser.deleteAllCookies();
+await browser.execute(() => {
+  window.localStorage.clear();
+  window.sessionStorage.clear();
+});
+await browser.refresh();
+
+This can reset the state without the overhead of a full session reload.
+
+
+2. Force New Tab Handling with Waits:
+Ensure that every time a new tab is opened, you wait explicitly for it to load:
+
+await browser.newWindow(url);
+await browser.waitUntil(
+  async () => (await browser.getWindowHandles()).length > 1,
+  { timeout: 10000, timeoutMsg: 'New tab did not open in time' }
+);
+// Switch and wait for expected URL or element
+const handles = await browser.getWindowHandles();
+await browser.switchWindow(handles[handles.length - 1]);
+await browser.waitUntil(
+  async () => (await browser.getUrl()).includes(expectedUrlPart),
+  { timeout: 10000, timeoutMsg: 'Page did not load as expected' }
+);
+
+This can help avoid hanging when the new tab is stuck loading.
+
+
+3. Reduce Parallelism:
+If multiple tests are opening tabs simultaneously, reducing the maxInstances or running tests sequentially can prevent state collisions.
+
+
+
+Final Thought:
+Using browser.reloadSession() is a brute-force approach that resets everything but comes at a cost. Clearing cookies and storage combined with proper waiting and tab management might be a gentler solution that avoids the multiple listeners warning and speeds up your tests.
+
+Let me know if you’d like to explore these alternatives further or need any more adjustments!
+
