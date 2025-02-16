@@ -75,3 +75,42 @@ Let me know if you’d like to explore these alternatives further or need any mo
   },
   "include": ["test", "wdio.conf.ts"]
 }
+
+static async navigateAndVerifyButtons(mockData = false): Promise<void> {
+    const originalWindow = await browser.getWindowHandle();
+
+    for (const button of dashboardButtonSelectors) {
+        const buttonElement = await $(`[aria-label='${button.ariaLabel}']`);
+        await waitForElementToBeDisplayed(buttonElement);
+
+        if (mockData) {
+            if (button.ariaLabel === 'Find_my_pensions_button' || button.ariaLabel === 'View_Money_Mindset_Rewards_button') {
+                continue;
+            }
+        }
+
+        await buttonElement.click();
+
+        if (button.shouldOpenNewTab) {
+            await browser.waitUntil(async () => (await browser.getWindowHandles()).length > 1, { timeout: 10000 });
+
+            const handles = await browser.getWindowHandles();
+            await browser.switchWindow(handles[handles.length - 1]);
+            await waitForPageLoadWithRefresh();
+
+            if (button.waitForSelector) {
+                await waitForElementToBeDisplayed($(button.waitForSelector));
+            }
+
+            expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+            await browser.closeWindow();
+            await browser.switchWindow(originalWindow);
+        } else {
+            if (button.waitForSelector) {
+                await waitForElementToBeDisplayed($(button.waitForSelector));
+            }
+
+            expect(await browser.getUrl()).toContain(button.expectedUrlContains);
+        }
+    }
+}
