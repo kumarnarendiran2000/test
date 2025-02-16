@@ -56,3 +56,22 @@ Using browser.reloadSession() is a brute-force approach that resets everything b
 
 Let me know if you’d like to explore these alternatives further or need any more adjustments!
 
+
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "types": [
+      "node",
+      "@wdio/globals/types",
+      "expect-webdriverio",
+      "@wdio/mocha-framework"
+    ],
+    "baseUrl": ".", 
+    "paths": {
+      "~/*": ["./*"] 
+    }
+  },
+  "include": ["test", "wdio.conf.ts"]
+}
