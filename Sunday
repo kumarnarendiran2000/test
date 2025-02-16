@@ -335,4 +335,24 @@ This will increase test clarity, improve debugging, and reduce execution time.
 Would you like any further adjustments?
 
 
+Jira Comment:
+
+The current update includes WDIO with Edge as the automation browser. Three key scenarios have been sorted and successfully trialed locally:
+
+1. Test Harness Comparison – Verifying Ember Dashboard vs. Legacy SLAL Dashboard values.
+
+
+2. AWS-Hosted Dashboard Comparison – Comparing contribution values in Ember and DG Dashboards.
+
+
+3. Mock SLAL Server Data – Fetching and validating contribution values against Ember Dashboard.
+
+
+
+All scenarios include element interactions alongside contribution value verification. Currently refactoring the suite and integrating Scenario 3 with Mock SLAL data and Ember Dashboard interactions.
+
+PRs are created and under review. Work in progress on screenshot integration, Allure reporting, and CI pipeline setup, nearing completion. Will be feeding PRs one after another post-optimization and final refinements.
+
+
+
 
