@@ -97,3 +97,6 @@ it(`Verifies the welcome message for ${testUser1.welcomeName}`, async () => {
   
   await expect(welcomeTextElement).toBeDisplayed();
 });
+
+const valueExists = await $(`//span[normalize-space(.)="${testUser1.latestPayment}"]`).isDisplayed();
+expect(valueExists).toBe(true);
