@@ -120,3 +120,9 @@ onComplete: function (exitCode, config, capabilities, results) {
     execSync(`start ${reportPath}`, { stdio: 'inherit', shell: true }); // Windows
     execSync(`open ${reportPath}`, { stdio: 'inherit', shell: true });  // Mac
 }
+
+- name: Upload Allure Report
+  uses: actions/upload-artifact@v3
+  with:
+    name: allure-report
+    path: allure-report/index.html
