@@ -100,3 +100,5 @@ it(`Verifies the welcome message for ${testUser1.welcomeName}`, async () => {
 
 const valueExists = await $(`//span[normalize-space(.)="${testUser1.latestPayment}"]`).isDisplayed();
 expect(valueExists).toBe(true);
+
+//span[contains(text(), '£') and contains(text(), '343.75')]
