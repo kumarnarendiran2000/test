@@ -89,3 +89,11 @@ describe('User dashboard tests', () => {
   });
 
 });
+
+
+it(`Verifies the welcome message for ${testUser1.welcomeName}`, async () => {
+  const expectedWelcomeText = `Welcome back, ${testUser1.welcomeName}`;
+  const welcomeTextElement = $(`//*[contains(text(), '${expectedWelcomeText}')]`);
+  
+  await expect(welcomeTextElement).toBeDisplayed();
+});
