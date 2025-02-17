@@ -1,0 +1,91 @@
+import { authenticate } from '../utils/authenticate';
+import { testPacks, urls } from '../utils/testConfig';
+import DashboardScreen from '../pages/dashboardScreen';
+
+describe('User dashboard tests', () => {
+  before(async () => {
+    await browser.maximizeWindow();
+  });
+
+  const testUser1 = testPacks[0]; // First user
+  const testUser2 = testPacks[1]; // Second user
+  const testUser3 = testPacks[2]; // Third user (if needed)
+
+  describe(`Validating dashboard values for ${testUser1.welcomeName}`, () => {
+    
+    it('Opens dashboard, authenticates and accepts cookies', async () => {
+      await DashboardScreen.openDashboard(urls.localDevDashboard);
+      await authenticate(testUser1.standardLifeId);
+      await DashboardScreen.acceptAllCookies();
+      await DashboardScreen.waitForDashboard();
+    });
+
+    it(`Validates total value: ${testUser1.totalValue}`, async () => {
+      const valueExists = await $(`//*[contains(text(), '${testUser1.totalValue}')]`).isDisplayed();
+      expect(valueExists).toBe(true);
+    });
+
+    if (testUser1.growthValue) {
+      it(`Validates growth value: ${testUser1.growthValue}`, async () => {
+        const valueExists = await $(`//*[contains(text(), '${testUser1.growthValue}')]`).isDisplayed();
+        expect(valueExists).toBe(true);
+      });
+    }
+
+    it('Logs out after validation', async () => {
+      await DashboardScreen.logoutDashboard();
+    });
+
+  });
+
+  describe(`Validating dashboard values for ${testUser2.welcomeName}`, () => {
+    
+    it('Opens dashboard, authenticates and accepts cookies', async () => {
+      await DashboardScreen.openDashboard(urls.localDevDashboard);
+      await authenticate(testUser2.standardLifeId);
+      await DashboardScreen.acceptAllCookies();
+      await DashboardScreen.waitForDashboard();
+    });
+
+    it(`Validates total transfer value: ${testUser2.totalTransferValue}`, async () => {
+      const valueExists = await $(`//*[contains(text(), '${testUser2.totalTransferValue}')]`).isDisplayed();
+      expect(valueExists).toBe(true);
+    });
+
+    it(`Validates total payment: ${testUser2.totalPayment}`, async () => {
+      const valueExists = await $(`//*[contains(text(), '${testUser2.totalPayment}')]`).isDisplayed();
+      expect(valueExists).toBe(true);
+    });
+
+    it('Logs out after validation', async () => {
+      await DashboardScreen.logoutDashboard();
+    });
+
+  });
+
+  describe(`Validating dashboard values for ${testUser3.welcomeName}`, () => {
+    
+    it('Opens dashboard, authenticates and accepts cookies', async () => {
+      await DashboardScreen.openDashboard(urls.localDevDashboard);
+      await authenticate(testUser3.standardLifeId);
+      await DashboardScreen.acceptAllCookies();
+      await DashboardScreen.waitForDashboard();
+    });
+
+    it(`Validates total value: ${testUser3.totalValue}`, async () => {
+      const valueExists = await $(`//*[contains(text(), '${testUser3.totalValue}')]`).isDisplayed();
+      expect(valueExists).toBe(true);
+    });
+
+    it(`Validates total withdrawal value: ${testUser3.totalWithdrawValue}`, async () => {
+      const valueExists = await $(`//*[contains(text(), '${testUser3.totalWithdrawValue}')]`).isDisplayed();
+      expect(valueExists).toBe(true);
+    });
+
+    it('Logs out after validation', async () => {
+      await DashboardScreen.logoutDashboard();
+    });
+
+  });
+
+});
