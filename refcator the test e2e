@@ -102,3 +102,21 @@ const valueExists = await $(`//span[normalize-space(.)="${testUser1.latestPaymen
 expect(valueExists).toBe(true);
 
 //span[contains(text(), '£') and contains(text(), '343.75')]
+
+onComplete: function (exitCode, config, capabilities, results) {
+    console.log('All tests are completed! Generating the Allure report...');
+    const { execSync } = require('child_process');
+
+    // Generate the report
+    execSync('npx allure generate allure-results --clean', { stdio: 'inherit' });
+
+    // Open the index.html file directly instead of spinning up a server
+    const path = require('path');
+    const reportPath = path.resolve(__dirname, 'allure-report', 'index.html');
+
+    console.log(`Opening Allure report at: ${reportPath}`);
+    
+    // Open the report in the default browser (works on Mac & Windows)
+    execSync(`start ${reportPath}`, { stdio: 'inherit', shell: true }); // Windows
+    execSync(`open ${reportPath}`, { stdio: 'inherit', shell: true });  // Mac
+}
