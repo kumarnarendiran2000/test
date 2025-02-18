@@ -1,0 +1,25 @@
+import { execSync } from 'child_process';
+import path from 'path';
+
+onComplete(exitCode, config, capabilities, results) {
+    console.log('All tests are completed! Generating the Allure report...');
+
+    // Generate Allure report
+    execSync('npx allure generate --single-file --clean allure-results', { stdio: 'inherit' });
+
+    // Resolve the path to the generated Allure report
+    const reportPath = path.resolve(__dirname, 'allure-report', 'index.html');
+
+    console.log(`Opening Allure report at: ${reportPath}`);
+
+    // Open report in the default browser based on OS
+    if (process.platform === 'win32') {
+        execSync(`start ${reportPath}`, { stdio: 'inherit', shell: true }); // Windows
+    } else if (process.platform === 'darwin') {
+        execSync(`open ${reportPath}`, { stdio: 'inherit', shell: true }); // Mac
+    } else if (process.platform === 'linux') {
+        execSync(`xdg-open ${reportPath}`, { stdio: 'inherit', shell: true }); // Linux
+    } else {
+        console.log('Unsupported OS. Please open the report manually.');
+    }
+}
