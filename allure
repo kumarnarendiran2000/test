@@ -12,13 +12,16 @@ onComplete(exitCode, config, capabilities, results) {
 
     console.log(`Opening Allure report at: ${reportPath}`);
 
-    // Open report in the default browser based on OS
+    // Determine the shell based on OS
+    let shellPath = '/bin/bash'; // Default for Linux/macOS
+
     if (process.platform === 'win32') {
-        execSync(`start ${reportPath}`, { stdio: 'inherit', shell: true }); // Windows
+        shellPath = 'cmd.exe';
+        execSync(`start ${reportPath}`, { stdio: 'inherit', shell: shellPath });
     } else if (process.platform === 'darwin') {
-        execSync(`open ${reportPath}`, { stdio: 'inherit', shell: true }); // Mac
+        execSync(`open ${reportPath}`, { stdio: 'inherit', shell: shellPath });
     } else if (process.platform === 'linux') {
-        execSync(`xdg-open ${reportPath}`, { stdio: 'inherit', shell: true }); // Linux
+        execSync(`xdg-open ${reportPath}`, { stdio: 'inherit', shell: shellPath });
     } else {
         console.log('Unsupported OS. Please open the report manually.');
     }
