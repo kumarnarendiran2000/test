@@ -721,3 +721,83 @@ export default class CustomLogger extends Reporter {
         this.write(`FINAL STATUS: ${status}`);
     }
 }
+
+
+import Reporter from '@wdio/reporter';
+import { RunnerStats, SuiteStats, TestStats } from '@wdio/reporter';
+import { Options } from '@wdio/types/build/Reporters';
+import { appendFileSync, existsSync, mkdirSync, rmSync } from 'fs';
+import { join } from 'path';
+
+export default class CustomLogger extends Reporter {
+    private logFilePath: string;
+
+    constructor(options: Partial<Options>) {
+        super(options);
+        
+        // Get current date for organizing logs
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        const logDir = join(process.cwd(), 'logs', date);
+        const screenshotDir = join(process.cwd(), 'screenshots');
+
+        // Ensure logs and screenshots folders exist
+        if (!existsSync(logDir)) {
+            mkdirSync(logDir, { recursive: true });
+        }
+
+        // Cleanup and recreate screenshots directory
+        if (existsSync(screenshotDir)) {
+            rmSync(screenshotDir, { recursive: true, force: true });
+        }
+        mkdirSync(join(screenshotDir, 'success'), { recursive: true });
+        mkdirSync(join(screenshotDir, 'failure'), { recursive: true });
+
+        console.log(`Logs will be stored in: ${logDir}`);
+        console.log(`Screenshots folder reset and ready.`);
+
+        // Set log file path
+        this.logFilePath = join(logDir, 'wdio-e2e.log');
+    }
+
+    private writeLog(message: string): void {
+        const timestamp = new Date().toISOString();
+        const logMessage = `[${timestamp}] ${message}\n`;
+        appendFileSync(this.logFilePath, logMessage, { encoding: 'utf-8' });
+    }
+
+    public onSuiteStart(suite: SuiteStats): void {
+        this.writeLog(`🟢 SUITE STARTED: ${suite.title}`);
+    }
+
+    public onSuiteEnd(suite: SuiteStats): void {
+        this.writeLog(`🟢 SUITE ENDED: ${suite.title}`);
+    }
+
+    public onTestStart(test: { title: string }): void {
+        this.writeLog(`🚀 STARTING TEST: ${test.title}`);
+    }
+
+    public onTestPass(test: { title: string }): void {
+        this.writeLog(`✅ TEST PASSED: ${test.title}`);
+    }
+
+    public onTestFail(test: TestStats): void {
+        this.writeLog(`❌ TEST FAILED: ${test.title}`);
+        if (test.error) {
+            this.writeLog(`⚠ ERROR: ${test.error.message}`);
+        }
+    }
+
+    public onTestEnd(test: { title: string }): void {
+        this.writeLog(`🛑 TEST ENDED: ${test.title}`);
+    }
+
+    public onRunnerEnd(runner: RunnerStats): void {
+        const status = runner.failures > 0 ? '❌ FAILED' : '✅ PASSED';
+        const specs = runner.specs.join(', ');
+
+        this.writeLog(`🏁 TEST RUN COMPLETED`);
+        this.writeLog(`🔍 FINAL STATUS: ${status}`);
+        this.writeLog(`📄 Specs executed: ${specs}`);
+    }
+}
