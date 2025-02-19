@@ -672,3 +672,52 @@ const expectedUrlPattern = /www\.instagram\.com\/(standardlifeuk|accounts\/login
 const currentUrl = await browser.getUrl();
 
 expect(currentUrl).toMatch(expectedUrlPattern);
+
+
+
+import Reporter from '@wdio/reporter';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
+
+export default class CustomLogger extends Reporter {
+    private logDir: string;
+
+    constructor(options: any) {
+        super(options);
+        
+        // Set up log directory with date-wise organization
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        this.logDir = join(process.cwd(), 'logs', date);
+    }
+
+    /**
+     * Called once before workers are launched (moved from onPrepare hook)
+     */
+    public onRunnerStart(): void {
+        if (!existsSync(this.logDir)) {
+            mkdirSync(this.logDir, { recursive: true });
+            console.log(`Logs will be stored in: ${this.logDir}`);
+        }
+    }
+
+    public onTestStart(test: { title: string }): void {
+        this.write(`🟡 STARTING TEST: ${test.title}`);
+    }
+
+    public onTestPass(test: { title: string }): void {
+        this.write(`✅ TEST PASSED: ${test.title}`);
+    }
+
+    public onTestFail(test: { title: string, error: { message: string } }): void {
+        this.write(`❌ TEST FAILED: ${test.title}`);
+        if (test.error) {
+            this.write(`🚨 ERROR: ${test.error.message}`);
+        }
+    }
+
+    public onRunnerEnd(runner: any): void {
+        const status = runner.failures > 0 ? 'FAILED' : 'PASSED';
+        this.write(`🏁 TEST RUN COMPLETED`);
+        this.write(`FINAL STATUS: ${status}`);
+    }
+}
