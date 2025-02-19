@@ -1,0 +1,308 @@
+Yes! If you prefer a simpler approach without using class-based inheritance, you can implement the WebdriverIO Custom Reporter using a functional approach in TypeScript or JavaScript.
+
+
+---
+
+✅ Alternative: Functional WebdriverIO Custom Reporter (No Class)
+
+Instead of extending Reporter, you can directly define and export functions inside a module.
+
+📄 Create customLogger.ts inside tests/e2e/reporters/
+
+import fs from 'fs';
+import path from 'path';
+
+const logFilePath = path.join(process.cwd(), 'tests/e2e/reports/wdio-e2e.log');
+
+/**
+ * Helper function to write logs to a file
+ */
+function writeLog(message: string) {
+    const timeStamp = new Date().toISOString();
+    const logMessage = `[${timeStamp}] ${message}\n`;
+    fs.appendFileSync(logFilePath, logMessage, { encoding: 'utf8' });
+}
+
+export const CustomLogger = {
+    onTestStart: (test: any) => {
+        writeLog(`STARTING TEST: ${test.title}`);
+    },
+    onTestPass: (test: any) => {
+        writeLog(`✅ TEST PASSED: ${test.title}`);
+    },
+    onTestFail: (test: any) => {
+        writeLog(`❌ TEST FAILED: ${test.title}`);
+        if (test.error) {
+            writeLog(`ERROR: ${test.error.message}`);
+        }
+    },
+    onTestEnd: (test: any) => {
+        writeLog(`TEST ENDED: ${test.title}`);
+    },
+    onSuiteStart: (suite: any) => {
+        writeLog(`📌 SUITE STARTED: ${suite.title}`);
+    },
+    onSuiteEnd: (suite: any) => {
+        writeLog(`📌 SUITE ENDED: ${suite.title}`);
+    },
+    onRunnerEnd: () => {
+        writeLog(`🎯 TEST RUN COMPLETED`);
+    }
+};
+
+
+---
+
+✅ Step 2: Register in wdio.conf.ts
+
+📄 Modify wdio.conf.ts
+
+import { CustomLogger } from './tests/e2e/reporters/customLogger';
+
+export const config: WebdriverIO.Config = {
+    reporters: [
+        'spec',  // Keep the default Spec Reporter for console logs
+        CustomLogger // Use functional logger
+    ],
+};
+
+
+---
+
+✅ Why This is Better?
+
+1. No need for a class – uses a simple object with functions.
+
+
+2. More readable – just functions that WebdriverIO calls at different events.
+
+
+3. No need to extend Reporter – WebdriverIO directly calls our exported functions.
+
+
+
+
+---
+
+✅ Works Exactly Like Before!
+
+🚀 Run your test suite, and logs will be saved inside:
+
+tests/e2e/reports/wdio-e2e.log
+
+✅ Example log output:
+
+[2025-02-18T14:35:01.987Z] 📌 SUITE STARTED: User Dashboard Tests
+[2025-02-18T14:35:05.312Z] STARTING TEST: Validates total value for TestUser
+[2025-02-18T14:35:08.212Z] ✅ TEST PASSED: Validates total value for TestUser
+[2025-02-18T14:35:12.198Z] STARTING TEST: Validates latest payment value for TestUser
+[2025-02-18T14:35:15.789Z] ❌ TEST FAILED: Validates latest payment value for TestUser
+[2025-02-18T14:35:15.789Z] ERROR: Expected £343.75 but found £0.00
+[2025-02-18T14:35:18.001Z] 📌 SUITE ENDED: User Dashboard Tests
+[2025-02-18T14:35:20.453Z] 🎯 TEST RUN COMPLETED
+
+
+---
+
+✅ Bonus: Upload Logs in CI
+
+If you want to upload the log file as an artifact in GitHub Actions, modify your .github/workflows/e2e-pipeline.yml:
+
+- name: Upload WebdriverIO Logs
+  uses: actions/upload-artifact@v4
+  with:
+    name: wdio-logs
+    path: tests/e2e/reports/wdio-e2e.log
+    retention-days: 7
+
+
+---
+
+Final Thoughts
+
+🔹 No need for class – just a simple object with functions.
+🔹 Still fully compatible with WebdriverIO lifecycle hooks.
+🔹 Easier to maintain and avoids unnecessary complexity.
+
+🚀 You're all set! Run your tests and verify that logs are being generated.
+Let me know if you need any modifications!
+
+
+
+
+
+Great choice! Using a WebdriverIO Custom Reporter will help you structure your logs properly while keeping everything within WebdriverIO's ecosystem. Below is a step-by-step guide to implementing a custom reporter that logs test execution details to a file.
+
+
+---
+
+Step 1: Create a Custom Reporter File
+
+WebdriverIO allows us to create a custom reporter by extending the Reporter class. Let's create a new reporter file:
+
+📁 Directory Structure:
+
+tests/
+  ├── e2e/
+  │   ├── reports/
+  │   │   ├── wdio-e2e.log
+  │   ├── reporters/
+  │   │   ├── customLogger.ts
+
+📌 Create customLogger.ts inside tests/e2e/reporters/
+
+
+---
+
+Step 2: Implement the Custom Reporter
+
+📄 customLogger.ts
+
+import fs from 'fs';
+import path from 'path';
+import { Reporter } from '@wdio/reporter';
+
+export default class CustomLogger extends Reporter {
+    private logFilePath: string;
+
+    constructor(options: any) {
+        super(options);
+        this.logFilePath = path.join(process.cwd(), 'tests/e2e/reports/wdio-e2e.log');
+    }
+
+    /**
+     * Helper function to write logs to a file
+     */
+    private writeLog(message: string) {
+        const timeStamp = new Date().toISOString();
+        const logMessage = `[${timeStamp}] ${message}\n`;
+        fs.appendFileSync(this.logFilePath, logMessage, { encoding: 'utf8' });
+    }
+
+    /**
+     * Called when a test starts
+     */
+    public onTestStart(test: any) {
+        this.writeLog(`STARTING TEST: ${test.title}`);
+    }
+
+    /**
+     * Called when a test passes
+     */
+    public onTestPass(test: any) {
+        this.writeLog(`✅ TEST PASSED: ${test.title}`);
+    }
+
+    /**
+     * Called when a test fails
+     */
+    public onTestFail(test: any) {
+        this.writeLog(`❌ TEST FAILED: ${test.title}`);
+        if (test.error) {
+            this.writeLog(`ERROR: ${test.error.message}`);
+        }
+    }
+
+    /**
+     * Called when a test completes (pass or fail)
+     */
+    public onTestEnd(test: any) {
+        this.writeLog(`TEST ENDED: ${test.title}`);
+    }
+
+    /**
+     * Called when the suite starts
+     */
+    public onSuiteStart(suite: any) {
+        this.writeLog(`📌 SUITE STARTED: ${suite.title}`);
+    }
+
+    /**
+     * Called when the suite ends
+     */
+    public onSuiteEnd(suite: any) {
+        this.writeLog(`📌 SUITE ENDED: ${suite.title}`);
+    }
+
+    /**
+     * Called when all tests finish execution
+     */
+    public onRunnerEnd() {
+        this.writeLog(`🎯 TEST RUN COMPLETED`);
+    }
+}
+
+
+---
+
+Step 3: Register the Custom Reporter in wdio.conf.ts
+
+Now that we have our custom reporter, we need to register it inside the WebdriverIO configuration file.
+
+📄 Modify wdio.conf.ts
+
+import CustomLogger from './tests/e2e/reporters/customLogger';
+
+export const config: WebdriverIO.Config = {
+    reporters: [
+        'spec',  // Keep the default Spec Reporter for console logs
+        [CustomLogger, {}] // Add our custom logger
+    ],
+};
+
+
+---
+
+Step 4: Run Tests and View Logs
+
+Once you run your test suite, WebdriverIO will automatically write test execution details to:
+
+tests/e2e/reports/wdio-e2e.log
+
+✅ Example log output:
+
+[2025-02-18T14:35:01.987Z] 📌 SUITE STARTED: User Dashboard Tests
+[2025-02-18T14:35:05.312Z] STARTING TEST: Validates total value for TestUser
+[2025-02-18T14:35:08.212Z] ✅ TEST PASSED: Validates total value for TestUser
+[2025-02-18T14:35:12.198Z] STARTING TEST: Validates latest payment value for TestUser
+[2025-02-18T14:35:15.789Z] ❌ TEST FAILED: Validates latest payment value for TestUser
+[2025-02-18T14:35:15.789Z] ERROR: Expected £343.75 but found £0.00
+[2025-02-18T14:35:18.001Z] 📌 SUITE ENDED: User Dashboard Tests
+[2025-02-18T14:35:20.453Z] 🎯 TEST RUN COMPLETED
+
+
+---
+
+Bonus: Upload Log File in CI Pipeline
+
+If you want to upload the log file as an artifact in GitHub Actions, modify your .github/workflows/e2e-pipeline.yml:
+
+- name: Upload WebdriverIO Logs
+  uses: actions/upload-artifact@v4
+  with:
+    name: wdio-logs
+    path: tests/e2e/reports/wdio-e2e.log
+    retention-days: 7
+
+
+---
+
+Conclusion
+
+🚀 Now you have structured logs inside a WebdriverIO Custom Reporter!
+
+This integrates directly with WebdriverIO's lifecycle.
+
+It writes structured logs to a file.
+
+You don't need Winston anymore.
+
+It automatically logs test execution without manual function calls.
+
+
+Next Steps:
+✅ Run the test suite and verify tests/e2e/reports/wdio-e2e.log is being generated.
+✅ Update your CI pipeline to upload logs as artifacts.
+
+Let me know if you need any refinements! 🚀
+
