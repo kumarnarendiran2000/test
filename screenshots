@@ -1,0 +1,32 @@
+import { existsSync, mkdirSync, rmSync } from 'fs';
+import { join } from 'path';
+
+export const config: WebdriverIO.Config = {
+  onPrepare: () => {
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const logDir = join(process.cwd(), 'logs', date);
+    const screenshotDir = join(process.cwd(), 'screenshots');
+    const successDir = join(screenshotDir, 'success');
+    const failureDir = join(screenshotDir, 'failure');
+
+    // Ensure logs directory exists (DO NOT DELETE logs, only create if missing)
+    if (!existsSync(logDir)) {
+      mkdirSync(logDir, { recursive: true });
+    }
+    console.log(`Logs will be stored in: ${logDir}`);
+
+    // If `screenshots` folder exists, delete it completely
+    if (existsSync(screenshotDir)) {
+      rmSync(screenshotDir, { recursive: true, force: true });
+      console.log(`Deleted existing screenshots folder: ${screenshotDir}`);
+    }
+
+    // Recreate `screenshots` folder with `success` and `failure` subfolders
+    mkdirSync(successDir, { recursive: true });
+    mkdirSync(failureDir, { recursive: true });
+
+    console.log(`Screenshots will be stored in: ${screenshotDir}`);
+    console.log(`Success screenshots folder created: ${successDir}`);
+    console.log(`Failure screenshots folder created: ${failureDir}`);
+  },
+};
