@@ -482,3 +482,48 @@ export default class CustomLogger extends Reporter {
 
 
 
+reporters: [
+  'spec',
+  ['path/to/CustomLogger', {
+    outputDir: './logs',  // Set log directory
+    filename: `wdio-e2e-${new Date().toISOString().split('T')[0]}.log` // Auto-generate daily log files
+  }]
+],
+
+import Reporter from '@wdio/reporter';
+
+export default class CustomLogger extends Reporter {
+  constructor(options: any) {
+    super(options);
+  }
+
+  public onSuiteStart(suite: any): void {
+    this.write(`📂 SUITE STARTED: ${suite.title}\n`);
+  }
+
+  public onTestStart(test: any): void {
+    this.write(`🟡 STARTING TEST: ${test.title}\n`);
+  }
+
+  public onTestPass(test: any): void {
+    this.write(`✅ TEST PASSED: ${test.title}\n`);
+  }
+
+  public onTestFail(test: any): void {
+    this.write(`❌ TEST FAILED: ${test.title}\n`);
+    if (test.error) {
+      this.write(`⚠️ ERROR: ${test.error.message}\n`);
+    }
+  }
+
+  public onTestEnd(test: any): void {
+    this.write(`🔵 TEST ENDED: ${test.title}\n`);
+  }
+
+  public onRunnerEnd(runner: any): void {
+    const status = runner.failures > 0 ? 'FAILED' : 'PASSED';
+    this.write(`🏁 TEST RUN COMPLETED\n`);
+    this.write(`📌 FINAL STATUS: ${status}\n`);
+    this.write(`📜 Specs executed: ${runner.specs.join(', ')}\n`);
+  }
+}
