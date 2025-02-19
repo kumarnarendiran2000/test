@@ -527,3 +527,143 @@ export default class CustomLogger extends Reporter {
     this.write(`📜 Specs executed: ${runner.specs.join(', ')}\n`);
   }
 }
+
+
+Sure! Below is the complete WebdriverIO configuration and CustomLogger.ts implementation that:
+
+✅ Uses WebdriverIO’s custom reporter
+✅ Logs into a separate folder per day (e.g., logs/2025-02-19/wdio-e2e.log)
+✅ Leverages this.write for structured logging
+✅ No deletion of logs, just structured storage
+
+
+---
+
+1. WebdriverIO Configuration (wdio.conf.ts)
+
+This ensures the log folder is created dynamically for each test run.
+
+import fs from 'fs';
+import path from 'path';
+
+export const config: WebdriverIO.Config = {
+  framework: 'mocha',
+
+  reporters: [
+    ['spec'],
+    ['customLogger', {}] // Register the custom logger
+  ],
+
+  onPrepare: () => {
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const logDir = path.join(process.cwd(), 'logs', date);
+
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+      console.log(`Logs will be stored in: ${logDir}`);
+    }
+  },
+};
+
+
+---
+
+2. Custom Reporter (customLogger.ts)
+
+This will store logs in logs/YYYY-MM-DD/wdio-e2e.log and write logs via this.write.
+
+import Reporter from '@wdio/reporter';
+import { appendFileSync } from 'fs';
+import { join } from 'path';
+
+export default class CustomLogger extends Reporter {
+  private logFilePath: string;
+
+  constructor(options: any) {
+    super(options);
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    this.logFilePath = join(process.cwd(), 'logs', date, 'wdio-e2e.log');
+  }
+
+  private writeLog(message: string): void {
+    appendFileSync(this.logFilePath, `${message}\n`, { encoding: 'utf-8' });
+    this.write(message); // Uses WebdriverIO’s built-in logging
+  }
+
+  public onSuiteStart(suite: any): void {
+    this.writeLog(`🟢 SUITE STARTED: ${suite.title}`);
+  }
+
+  public onSuiteEnd(suite: any): void {
+    this.writeLog(`🔴 SUITE ENDED: ${suite.title}`);
+  }
+
+  public onTestStart(test: any): void {
+    this.writeLog(`🚀 STARTING TEST: ${test.title}`);
+  }
+
+  public onTestPass(test: any): void {
+    this.writeLog(`✅ TEST PASSED: ${test.title}`);
+  }
+
+  public onTestFail(test: any): void {
+    this.writeLog(`❌ TEST FAILED: ${test.title}`);
+    if (test.error) {
+      this.writeLog(`⚠️ ERROR: ${test.error.message}`);
+    }
+  }
+
+  public onTestEnd(test: any): void {
+    this.writeLog(`🛑 TEST ENDED: ${test.title}`);
+  }
+
+  public onRunnerEnd(runner: any): void {
+    const status = runner.failures > 0 ? 'FAILED' : 'PASSED';
+    const specs = runner.specs.join(', ');
+
+    this.writeLog(`🏁 TEST RUN COMPLETED`);
+    this.writeLog(`📌 FINAL STATUS: ${status}`);
+    this.writeLog(`📄 Specs executed: ${specs}`);
+  }
+}
+
+
+---
+
+Expected Folder & Log Structure
+
+This will create logs per day like:
+
+logs/
+  ├── 2025-02-19/
+  │   ├── wdio-e2e.log
+  ├── 2025-02-20/
+  │   ├── wdio-e2e.log
+
+Example log file:
+
+🟢 SUITE STARTED: Dashboard Tests
+🚀 STARTING TEST: Opens dashboard, authenticates, and accepts cookies
+✅ TEST PASSED: Opens dashboard, authenticates, and accepts cookies
+🛑 TEST ENDED: Opens dashboard, authenticates, and accepts cookies
+...
+🏁 TEST RUN COMPLETED
+📌 FINAL STATUS: PASSED
+📄 Specs executed: tests/e2e/dashboard.spec.ts
+
+
+---
+
+Final Thoughts
+
+✅ Uses WebdriverIO's this.write method
+
+✅ No manual deletion of logs
+
+✅ Each day has a separate log folder
+
+✅ Works seamlessly in CI/CD and local
+
+
+Would this setup work for you?
+
