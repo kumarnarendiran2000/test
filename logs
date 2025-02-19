@@ -306,3 +306,127 @@ Next Steps:
 
 Let me know if you need any refinements! 🚀
 
+
+
+
+----
+
+
+Since you want to use WebdriverIO’s custom reporter but without using classes, you'll need an alternative way to hook into WebdriverIO’s lifecycle events while still registering a custom reporter.
+
+
+---
+
+🚀 Implementing WebdriverIO Custom Reporter in a Functional Way
+
+While WebdriverIO’s Reporter requires class-based extension, you can wrap it in a function-based approach by creating a factory function.
+
+
+---
+
+1️⃣ Create a Custom Reporter (customLogger.ts)
+
+Since we can’t directly extend the Reporter class in a function, we create a wrapper function that registers event handlers dynamically.
+
+import Reporter from '@wdio/reporter';
+import { appendFileSync } from 'fs';
+import { join } from 'path';
+
+// Log file path setup
+const logFilePath = join(process.cwd(), 'logs/wdio-e2e.log');
+
+// Helper function to write logs
+function writeLog(message: string) {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}\n`;
+    appendFileSync(logFilePath, logMessage, { encoding: 'utf-8' });
+}
+
+// ✅ Function-based WebdriverIO Custom Reporter
+export function createCustomReporter() {
+    const reporter = new Reporter({});
+
+    reporter.on('suite:start', (suite) => {
+        writeLog(`🟠 SUITE STARTED: ${suite.title}`);
+    });
+
+    reporter.on('suite:end', (suite) => {
+        writeLog(`🟢 SUITE ENDED: ${suite.title}`);
+    });
+
+    reporter.on('test:start', (test) => {
+        writeLog(`🔵 STARTING TEST: ${test.title}`);
+    });
+
+    reporter.on('test:pass', (test) => {
+        writeLog(`✅ TEST PASSED: ${test.title}`);
+    });
+
+    reporter.on('test:fail', (test) => {
+        writeLog(`❌ TEST FAILED: ${test.title}`);
+    });
+
+    reporter.on('runner:end', (runner) => {
+        const status = runner.failures > 0 ? 'FAILED' : 'PASSED';
+        writeLog(`🚀 TEST RUN COMPLETED`);
+        writeLog(`🔹 FINAL STATUS: ${status}`);
+    });
+
+    return reporter;
+}
+
+
+---
+
+2️⃣ Register Custom Reporter in wdio.conf.ts
+
+Since WebdriverIO expects reporters to be registered via configuration, we call our function inside wdio.conf.ts.
+
+import { createCustomReporter } from './utils/customLogger';
+
+export const config: WebdriverIO.Config = {
+    // Other WebdriverIO settings...
+    
+    reporters: [
+        [createCustomReporter()], // ✅ Registering function-based reporter
+    ],
+};
+
+
+---
+
+📌 How This Works
+
+✔️ createCustomReporter() returns a Reporter instance but is written without classes
+✔️ Lifecycle event handlers (on) listen dynamically
+✔️ Direct function-based logging is used (writeLog)
+✔️ No need to extend a class!
+
+
+---
+
+🔹 Should You Use This?
+
+✅ If you want WebdriverIO’s Custom Reporter but in a function-based structure
+✅ If you want lighter, modular logging without class inheritance
+✅ If you want flexibility in how logs are handled
+
+
+---
+
+🚀 Summary
+
+
+---
+
+💡 Final Thought
+
+Since WebdriverIO officially requires extending Reporter, if you absolutely need a custom reporter, the class-based method is recommended. But this function-based workaround lets you modularize logging while using WebdriverIO’s reporting API.
+
+
+---
+
+Let me know if you need further improvements! 🚀
+
+
+
