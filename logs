@@ -429,4 +429,56 @@ Since WebdriverIO officially requires extending Reporter, if you absolutely need
 Let me know if you need further improvements! 🚀
 
 
+export default class CustomLogger extends Reporter {
+    private logFilePath: string;
+
+    constructor(options: any) {
+        super(options);
+        this.logFilePath = join(process.cwd(), 'logs/wdio-e2e.log');
+    }
+
+    private writeLog(message: string) {
+        const timestamp = new Date().toISOString();
+        const logMessage = `[${timestamp}] ${message}\n`;
+        appendFileSync(this.logFilePath, logMessage, { encoding: 'utf-8' });
+    }
+
+    public onSuiteStart(suite: any) {
+        this.writeLog(`🟠 SUITE STARTED: ${suite.title}`);
+    }
+
+    public onSuiteEnd(suite: any) {
+        this.writeLog(`🟢 SUITE ENDED: ${suite.title}`);
+    }
+
+    public onTestStart(test: any) {
+        this.writeLog(`🔵 STARTING TEST: ${test.title}`);
+    }
+
+    public onTestPass(test: any) {
+        this.writeLog(`✅ TEST PASSED: ${test.title}`);
+    }
+
+    public onTestFail(test: any) {
+        this.writeLog(`❌ TEST FAILED: ${test.title}`);
+        if (test.error) {
+            this.writeLog(`🔺 ERROR: ${test.error.message}`);
+        }
+    }
+
+    public onTestEnd(test: any) {
+        this.writeLog(`🔹 TEST ENDED: ${test.title}`);
+    }
+
+    public onRunnerEnd(runner: any) {
+        const status = runner.failures > 0 ? 'FAILED' : 'PASSED';
+        const specs = runner.specs.join(', ');
+
+        this.writeLog(`🚀 TEST RUN COMPLETED`);
+        this.writeLog(`🔹 FINAL STATUS: ${status}`);
+        this.writeLog(`📄 Specs executed: ${specs}`);
+    }
+}
+
+
 
