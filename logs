@@ -667,3 +667,8 @@ Final Thoughts
 
 Would this setup work for you?
 
+
+const expectedUrlPattern = /www\.instagram\.com\/(standardlifeuk|accounts\/login)/;
+const currentUrl = await browser.getUrl();
+
+expect(currentUrl).toMatch(expectedUrlPattern);
