@@ -1,0 +1,84 @@
+Here’s the updated version of your Jira comment with your corrections:
+
+
+---
+
+The update is now complete with all the planned work for this ticket.
+
+Main Work Done:
+
+Ember Dashboard interaction with the Mock SLAL Server mock data is implemented.
+
+Scenario 3 has been covered in tests.
+
+The PR for this work is approved but yet to be merged.
+
+
+Additional Work & Open PRs:
+
+While working on this, I identified some optimization areas, which led to additional PRs:
+
+1. Optimization PR:
+
+Found further improvements while working on additional capabilities and included them in a separate PR.
+
+
+
+2. Custom Logger Integration:
+
+Logs are now saved to a file, grouped by date.
+
+Logs are formatted in a human-readable way to help developers quickly check issues.
+
+
+
+3. Screenshot Capture Capability:
+
+Screenshots are now stored in separate success and failure folders based on test run status.
+
+
+
+4. Allure Report Integration:
+
+Generates a single-page HTML report with failure screenshots embedded.
+
+Used the --single-file flag to avoid needing a local server for interactive reports.
+
+
+
+5. Actions Pipeline Integration:
+
+The pipeline now automatically checks out the repo, starts the servers, runs tests, and uploads screenshots & reports as artifacts.
+
+
+
+
+These PRs are open, and I’ll be following up on review comments and getting them closed soon.
+
+Additionally, I’m working on creating a Wiki page for this work to document everything properly.
+
+Let me know if anything else is needed!
+
+
+---
+
+This keeps everything clear, structured, and to the point. Let me know if you need any changes!
+
+
+
+Here’s how you can comment and close the ticket in a clear and professional way:
+
+
+---
+
+I’ve looked into Route 53, S3, deployment artifact management, Lambda setup, CloudWatch logs analysis, and WAF, covering their high-level flow, use cases, and practical applications within our AWS stack.
+
+For now, I’m closing this ticket as I’ve gained exposure to these areas. I’ll continue learning deeper and working on related tasks as I pick up tickets in this domain going forward.
+
+Let me know if any additional inputs are needed!
+
+
+---
+
+This keeps it concise and to the point while making it clear that you’ve gained an understanding but will explore more as you work on real tasks. Let me know if you want any changes!
+
