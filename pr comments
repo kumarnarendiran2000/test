@@ -18,3 +18,17 @@ export async function takeScreenshot(
 
   await browser.saveScreenshot(screenShotPath);
 }
+
+
+const screenshotDir = join(process.cwd(), 'screenshots');
+const successDir = join(screenshotDir, 'success');
+const failureDir = join(screenshotDir, 'failure');
+
+// Delete the screenshots directory (including subfolders) before recreating
+rmSync(screenshotDir, { recursive: true, force: true });
+
+// Recreate the necessary directories
+mkdirSync(successDir, { recursive: true });
+mkdirSync(failureDir, { recursive: true });
+
+console.log(`Screenshots directory initialized at: ${screenshotDir}`);
