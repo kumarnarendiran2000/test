@@ -32,3 +32,8 @@ mkdirSync(successDir, { recursive: true });
 mkdirSync(failureDir, { recursive: true });
 
 console.log(`Screenshots directory initialized at: ${screenshotDir}`);
+
+
+import { execFileSync } from 'child_process';
+
+execFileSync('allure', ['generate', '--clean', '-o', 'reports/allure/allure-report'], { stdio: 'inherit' });
