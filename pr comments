@@ -37,3 +37,39 @@ console.log(`Screenshots directory initialized at: ${screenshotDir}`);
 import { execFileSync } from 'child_process';
 
 execFileSync('allure', ['generate', '--clean', '-o', 'reports/allure/allure-report'], { stdio: 'inherit' });
+
+
+import debug from 'debug';
+
+// Define debug namespace
+const log = debug('wdio:onComplete');
+
+// Force debug logs to always be shown
+log.enabled = true;
+
+export const config: WebdriverIO.Config = {
+    onComplete() {
+        log('All tests are completed! Generating the Allure report...');
+
+        // Generate Allure report
+        execFileSync('allure', ['generate', '--clean', '-o', 'reports/allure/allure-report'], { stdio: 'inherit' });
+
+        // Resolve the path to the generated Allure report
+        const reportPath = resolve(
+            __dirname,
+            'reports/allure/allure-report',
+            'index.html'
+        );
+
+        log(`Opening Allure report at: ${reportPath}`);
+
+        // Determine the shell based on OS
+        if (process.platform === 'win32') {
+            execFileSync('cmd', ['/c', 'start', reportPath], { stdio: 'inherit' });
+        } else if (process.platform === 'darwin') {
+            execFileSync('open', [reportPath], { stdio: 'inherit' });
+        } else {
+            execFileSync('xdg-open', [reportPath], { stdio: 'inherit' });
+        }
+    }
+};
