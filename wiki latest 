@@ -341,3 +341,25 @@ Conclusion
 This setup ensures scalability, automation reliability, and smooth debugging for Ember Dashboard’s E2E tests. 🚀
 
 
+
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "web": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "e2e-test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "serve:mock": {
+      "outputs": []
+    },
+    "serve:local": {
+      "outputs": []
+    }
+  }
+}
+
+
