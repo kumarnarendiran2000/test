@@ -1,1 +1,9 @@
 // Increased timeout to 2 minutes to handle potential delays in test execution, ensuring stability in CI runs.
+
+Here’s a peer review comment you can use for the timeout increase to 2 minutes:
+
+Comment:
+"We increased the Mocha timeout to 120000ms (2 minutes) to ensure that tests have sufficient time to complete, especially in scenarios where initial setup, network requests, or UI rendering might take longer. This is particularly useful for CI/CD pipeline runs where execution times can vary due to resource availability. Let me know if you have any concerns or suggestions!"
+
+Let me know if you need any refinements!
+
