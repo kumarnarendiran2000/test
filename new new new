@@ -7,3 +7,20 @@ Comment:
 
 Let me know if you need any refinements!
 
+Your comment generally makes sense, but it can be refined for better clarity and professionalism. Here’s an improved version:
+
+
+---
+
+Actually, I increased the Mocha timeout to 120000ms (2 minutes) to ensure that tests have sufficient time to complete, especially in cases where initial setup, network requests, or UI rendering might take longer due to the local Expo server spinning up and stabilizing. This is particularly useful for the Actions pipeline, where execution times can vary.
+
+As suggested, we could build the frontend and run it in a local server, which would help mitigate this issue and make the tests less prone to delays. I’ll look into implementing that.
+
+That said, I don’t believe this increase will significantly impact execution times, but I’m happy to remove or adjust it if needed. I've added a comment in the code for now.
+
+
+---
+
+This version improves readability while maintaining all key points. Let me know if you need further tweaks!
+
+
