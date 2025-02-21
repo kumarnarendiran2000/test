@@ -131,3 +131,213 @@ Conclusion
 
 This setup ensures a scalable, structured, and reliable E2E testing framework for Ember Dashboard. It enables quick debugging, structured reporting, and smooth CI/CD integration. 🚀
 
+
+Ember Dashboard E2E Test Automation - Technical Wiki
+
+This document provides a detailed breakdown of the E2E test automation setup for Ember Dashboard, implemented using WebdriverIO (WDIO). It explains the test structure, logging mechanisms, screenshot handling, Allure reporting, and CI/CD pipeline integration.
+
+
+---
+
+1️⃣ Test Framework & Structure
+
+Framework & Configuration
+
+Test Runner: WebdriverIO (WDIO)
+
+Test Framework: Mocha
+
+Selectors & Test Execution:
+
+Selectors stored separately from test execution files for better maintainability.
+
+No direct Web Elements used → Easier migration to mobile test automation.
+
+
+Mock SLAL Server:
+
+Serves as the backend for test data, ensuring consistency in validations.
+
+
+
+Test Coverage
+
+UI Validation: Elements, text content, and key data points.
+
+User Interaction Testing: Button clicks, navigation flows, authentication.
+
+Value Assertion: Data retrieved from API vs. displayed on UI.
+
+
+
+---
+
+2️⃣ Logging & Debugging - Custom Logger
+
+✅ Custom WDIO Reporter Setup
+
+Integrated into WDIO as a custom reporter by extending @wdio/reporter.
+
+Logs stored in a structured folder format → logs/YYYY-MM-DD/wdio-e2e.log.
+
+Automatic log grouping by execution date:
+
+Folder Creation: Ensured using fs.existsSync() & fs.mkdirSync().
+
+File Handling: Logged using appendFileSync() from Node’s fs module.
+
+
+Logged Events:
+
+Test start, test pass, test fail (with errors), and test end.
+
+
+
+WDIO Configuration for Custom Logger
+
+Added to reporters array in wdio.conf.ts.
+
+Uses this.write() method for structured log formatting.
+
+
+
+---
+
+3️⃣ Screenshot Capture & Management
+
+✅ Implementation Using WDIO Hooks
+
+Hooks Used:
+
+onPrepare: Deletes & recreates screenshots folder before test execution.
+
+afterTest: Captures screenshots on failure.
+
+
+Folder Structure:
+
+Screenshots saved in screenshots/
+
+Grouped by status → screenshots/success/ & screenshots/failure/.
+
+
+Implementation Details:
+
+Used browser.saveScreenshot() inside afterTest hook.
+
+File Naming Format → testName-timestamp.png.
+
+Ensures clean execution by deleting screenshots folder at the start of each test run.
+
+
+
+
+---
+
+4️⃣ Allure Report Integration
+
+✅ Allure Report Configuration in WDIO
+
+Added to reporters array in wdio.conf.ts:
+
+reporters: [
+  'spec',
+  ['allure', { outputDir: 'allure-results', disableWebdriverStepsReporting: true, disableWebdriverScreenshotsReporting: false }]
+];
+
+Folder Management:
+
+onPrepare hook deletes previous results (allure-results & allure-report) before execution.
+
+onComplete hook generates the final report using:
+
+execSync('npx allure generate --single-file --clean allure-results');
+
+Single HTML report mode used (--single-file) for a lightweight approach.
+
+If not running in CI, the report automatically opens in the browser.
+
+
+
+✅ Screenshot Attachments for Failed Tests
+
+Implemented using addAttachment() in @wdio/allure-reporter.
+
+Failure screenshots embedded inside the Allure report.
+
+
+
+---
+
+5️⃣ CI/CD Pipeline (GitHub Actions Integration)
+
+✅ Triggers
+
+Manual trigger → Workflow dispatch.
+
+On push to main branch.
+
+Scheduled nightly execution (10 PM Cron Job).
+
+
+✅ Pipeline Steps
+1️⃣ Checkout Repository
+2️⃣ Start Frontend & Mock SLAL Server
+3️⃣ Run E2E Test Suite
+4️⃣ Upload Artifacts (Allure Reports & Screenshots)
+
+✅ Ensuring Frontend Readiness
+
+Introduced wait time before test execution to ensure the server is ready.
+
+Validates if the service is up by checking its response status.
+
+
+
+---
+
+6️⃣ Summary of Test Execution Flow
+
+1️⃣ Test Initialization
+
+Launches Ember Dashboard with mock authentication.
+
+Ensures cookies & UI elements load properly.
+
+
+2️⃣ Test Execution & Logging
+
+Custom Logger records test progress & failures.
+
+Screenshots captured for failed test cases.
+
+
+3️⃣ Post-Execution Reporting
+
+Allure Report generated with test logs and failure screenshots.
+
+Logs structured by date, ensuring easy debugging.
+
+Test results uploaded as artifacts in CI/CD.
+
+
+
+---
+
+Future Enhancements
+
+Expand test coverage for additional user interactions.
+
+Further optimize Allure Report structure.
+
+Investigate mobile test automation feasibility.
+
+
+
+---
+
+Conclusion
+
+This setup ensures scalability, automation reliability, and smooth debugging for Ember Dashboard’s E2E tests. 🚀
+
+
