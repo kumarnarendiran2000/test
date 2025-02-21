@@ -1,0 +1,133 @@
+Ember Dashboard E2E Test Automation - Wiki
+
+Overview
+
+This document outlines the end-to-end (E2E) test automation setup for Ember Dashboard, built using WebdriverIO (WDIO). It validates UI contents, interactions, and user flows while leveraging Mock SLAL Server Data.
+
+
+---
+
+Key Implementations
+
+1️⃣ Test Architecture
+
+Framework: WebdriverIO (WDIO) with Mocha.
+
+Test Structure:
+
+Selectors & Test Execution in Separate Files → Improves maintainability.
+
+No Direct Web Elements Used → Eases future mobile test integration.
+
+
+Test Coverage:
+
+Page contents (text, elements, values).
+
+Navigation, button clicks, form interactions.
+
+Data validation against mock API responses.
+
+
+
+
+---
+
+2️⃣ Logging, Reporting & Debugging
+
+✅ Custom Logger (WDIO Reporter)
+
+Stores execution logs in a human-readable format under logs/YYYY-MM-DD/wdio-e2e.log.
+
+Logs are grouped by test suite, execution status, and errors.
+
+
+✅ Screenshot Capturing
+
+Captures screenshots only for failed tests via the afterTest hook.
+
+Organizes them under screenshots/success/ & screenshots/failure/.
+
+
+✅ Allure Report Integration
+
+Generates a single-page HTML report (--single-file flag).
+
+Attaches failure screenshots using addAttachment().
+
+
+
+---
+
+3️⃣ CI/CD Pipeline (GitHub Actions)
+
+Triggers:
+
+Manual execution via workflow dispatch.
+
+Push to Main Branch.
+
+Nightly execution (10 PM Cron Job).
+
+
+Pipeline Steps:
+
+1. Checkout repository.
+
+
+2. Start Frontend & Mock SLAL Server.
+
+
+3. Execute E2E Test Suite.
+
+
+4. Upload Allure Reports & Screenshots as artifacts.
+
+
+
+
+
+---
+
+4️⃣ Technical Flow Summary
+
+1️⃣ Test Execution:
+
+Loads Ember Dashboard, authenticates via Mock SLAL Server, and validates elements & interactions.
+
+
+2️⃣ Logging & Debugging:
+
+Custom Logger records execution details.
+
+Screenshots captured for failures.
+
+Allure Report integrates screenshots & test logs.
+
+
+3️⃣ CI/CD Execution:
+
+Pipeline ensures server readiness before running tests.
+
+After execution, reports and screenshots are stored as artifacts.
+
+
+
+---
+
+Future Enhancements
+
+Expand test coverage for additional flows.
+
+Optimize report insights & test stability.
+
+Explore mobile test automation for React Native.
+
+
+
+---
+
+Conclusion
+
+This setup ensures a scalable, structured, and reliable E2E testing framework for Ember Dashboard. It enables quick debugging, structured reporting, and smooth CI/CD integration. 🚀
+
