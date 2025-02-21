@@ -1,0 +1,1 @@
+// Increased timeout to 2 minutes to handle potential delays in test execution, ensuring stability in CI runs.
