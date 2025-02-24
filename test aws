@@ -1,0 +1,1 @@
+openssl s_client -connect poc.welcome.standardlife.co.uk:443 -showcerts
