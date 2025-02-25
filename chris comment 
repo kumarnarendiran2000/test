@@ -1,0 +1,33 @@
+Your message makes sense, but it can be slightly refined for clarity and professionalism. Here’s a better version of your message:
+
+
+---
+
+Refined Message:
+
+Subject: Clarification on Wildcard Domains in AWS Certificate Manager
+
+Hi Chris,
+
+I was testing the certificates in AWS Certificate Manager and discussed this with Sundar as well. We observed that each certificate domain has multiple subdomains created with wildcards (*.), which we believe are unnecessary and may introduce excessive permissions.
+
+As seen in the attached image, environments like POC (poc.env) currently include wildcard subdomains, but we only require specific subdomains, such as staging.poc.welcome.standardlife.co.uk. The same issue applies to preprod and prod environments, where unnecessary wildcard subdomains are included.
+
+Could you confirm if this is an intended configuration? Otherwise, should we modify the certificate request logic to explicitly define only the required subdomains instead of using *.? If this needs to be fixed, should it be addressed before going live?
+
+Looking forward to your thoughts.
+
+Best,
+[Your Name]
+
+
+---
+
+Key Improvements:
+
+✅ Clearer structure – Highlights observations, issues, and questions.
+✅ More professional & polished tone – Removes informal phrasing.
+✅ Direct & actionable – Ends with a clear next step.
+
+Would you like me to adjust anything further? 🚀
+
