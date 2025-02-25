@@ -170,3 +170,40 @@ Object.entries(certResources).forEach(([resourceKey, resource]) => {
     throw new Error('SubjectAlternativeNames should not exist in the certificate resource');
   }
 });
+
+
+import { App } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { describe, test, expect } from 'vitest';
+import { MockSlalCertificateStack } from '../mock-slal-certificate-stack';
+
+describe('Mock Slal Certificate Stack', () => {
+  const app = new App();
+
+  const defaultAccount = '930688131692';
+  const defaultRegion = 'eu-west-1';
+
+  // Create the stack
+  const stack = new MockSlalCertificateStack(app, 'MockSlalCertificateStack', {
+    props: {
+      env: { account: defaultAccount, region: defaultRegion },
+    },
+    envName: 'poc',
+  });
+
+  // Convert stack to CloudFormation template
+  const template = Template.fromStack(stack);
+
+  test('stack should create a certificate with the correct domain and no subject alternative names', () => {
+    // ✅ Ensure the domain name is correctly set
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'mock-slal.poc.welcome.standardlife.co.uk',
+    });
+
+    // ❌ Ensure SubjectAlternativeNames does NOT exist
+    const certResources = template.findResources('AWS::CertificateManager::Certificate');
+    Object.values(certResources).forEach((resource) => {
+      expect(resource.Properties).not.toHaveProperty('SubjectAlternativeNames');
+    });
+  });
+});
