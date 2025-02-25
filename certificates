@@ -158,5 +158,15 @@ describe('Mock Slal Certificate Stack', () => {
       }
     }
   });
+
+
+
 });
 
+
+
+Object.entries(certResources).forEach(([resourceKey, resource]) => {
+  if (resource.Properties.SubjectAlternativeNames !== undefined) {
+    throw new Error('SubjectAlternativeNames should not exist in the certificate resource');
+  }
+});
