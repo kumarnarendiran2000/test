@@ -17,3 +17,22 @@ Acceptance Criteria:
 
 📌 Fix implemented, tested, and verified. 🚀
 
+
+
+Comment for EMBER-517 (Test Certificates Ticket):
+
+Tested the certificates as part of this story and identified an issue where wildcard (*.) subdomains were incorrectly added to ACM certificates. This led to unnecessary domain permissions and incorrect certificate configurations.
+
+Created a separate bug ticket to track this issue and currently working on the fix.
+
+Also, documented the test scenarios and in progress with validation. Once the issue is fixed, I will update the test document accordingly and attach it here in Jira as per the template.
+
+
+---
+
+Comment for the New Bug Ticket:
+
+Implemented the necessary CDK changes to ensure certificates are issued with the correct Subject Alternative Names (SANs). The fix includes updating the Certificate Stack, creating a separate Mock SLA Certificate Stack, and refining unit tests.
+
+Currently, the changes are yet to be fully tested. Will proceed with validation and update the ticket accordingly. 🚀
+
