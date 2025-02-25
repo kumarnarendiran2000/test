@@ -1,0 +1,21 @@
+export function createAcmCertificate(props: CertificateProps): Certificate {
+  const { scope, id, domainName, hostedZone, envName } = props;
+
+  let subjectAlternativeNames: string[] = [];
+
+  if (envName === 'dev') {
+    // Dev should have 3 separate certs with NO staging
+    subjectAlternativeNames = [];
+  } else if (envName === 'poc' || envName === 'prod' || envName === 'preprod') {
+    // Poc, Prod, Preprod should have only 1 cert each with a staging subdomain
+    subjectAlternativeNames = [`staging.${domainName}`];
+  }
+
+  const certificate = new Certificate(scope, id, {
+    domainName,
+    subjectAlternativeNames, // Now correctly set based on environment
+    validation: CertificateValidation.fromDns(hostedZone),
+  });
+
+  return certificate;
+}
