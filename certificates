@@ -122,3 +122,41 @@ cdk deploy
 
 📌 This ensures your tests match the new architecture and avoid unnecessary subject alternative names. Let me know if you need further refinements! 🚀
 
+
+import { App } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { describe, test } from 'vitest';
+import { MockSlalCertificateStack } from '../mock-slal-certificate-stack';
+
+describe('Mock Slal Certificate Stack', () => {
+  const app = new App();
+
+  const defaultAccount = '930688131692';
+  const defaultRegion = 'eu-west-1';
+
+  // Create the stack
+  const stack = new MockSlalCertificateStack(app, 'MockSlalCertificateStack', {
+    props: {
+      env: { account: defaultAccount, region: defaultRegion },
+    },
+    envName: 'poc',
+  });
+
+  // Convert stack to CloudFormation template
+  const template = Template.fromStack(stack);
+
+  test('stack should create a certificate with the correct domain and no subject alternative names', () => {
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'mock-slal.poc.welcome.standardlife.co.uk',
+    });
+
+    // Ensure SubjectAlternativeNames is NOT present
+    const certResources = template.findResources('AWS::CertificateManager::Certificate');
+    for (const resourceKey in certResources) {
+      if (certResources[resourceKey].Properties.SubjectAlternativeNames !== undefined) {
+        throw new Error('SubjectAlternativeNames should not exist in the certificate resource');
+      }
+    }
+  });
+});
+
