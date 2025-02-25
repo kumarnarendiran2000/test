@@ -36,3 +36,87 @@ Implemented the necessary CDK changes to ensure certificates are issued with the
 
 Currently, the changes are yet to be fully tested. Will proceed with validation and update the ticket accordingly. 🚀
 
+
+
+📌 PR Title:
+
+Fix Certificate Stack to Remove Unnecessary Wildcard SANs & Correct Mock SLA Server Certificate Handling
+
+
+---
+
+📝 PR Description:
+
+🔍 Summary
+
+This PR addresses the incorrect Subject Alternative Names (SANs) issue in AWS ACM certificates, ensuring that:
+
+1. Wildcard (*.) subdomains are no longer created unnecessarily.
+
+
+2. Mock SLA Server certificates now have only the required domain (mock-slal.poc.welcome.standardlife.co.uk) without subject alternative names.
+
+
+3. Modified the stack to pass subjectAlternativeNames to the construct, ensuring that only required subdomains are included.
+
+Staging environments include staging.<domain> where applicable.
+
+Non-staging environments (main, dev1, dev2) do not request a staging subdomain.
+
+The same construct is reused for Mock SLA Server to maintain consistency.
+
+
+
+4. Tests are updated to correctly validate expected ACM certificate properties.
+
+
+
+
+---
+
+🔧 Changes Implemented
+
+✅ Refactored CertificateStack to remove wildcard SANs and only include necessary subdomains.
+✅ Created a separate MockSlalCertificateStack to handle Mock SLA certificates independently.
+✅ Modified the stack to dynamically pass subjectAlternativeNames to the construct, ensuring:
+
+Staging environments include staging.<domain> where required.
+
+Non-staging environments (main, dev1, dev2) do not receive staging subdomains.
+
+Reused the same construct for Mock SLA Server, keeping the implementation consistent.
+✅ Modified test cases to:
+
+Validate that SANs are only added when needed.
+
+Ensure Mock SLA certificates do not include SubjectAlternativeNames.
+✅ Updated JIRA issue tracking (EMBER-517 linked to bug fix ticket).
+
+
+
+---
+
+🔎 Acceptance Criteria
+
+✔ Certificates in AWS ACM must only contain expected SANs.
+✔ Mock SLA Server certificate should only include mock-slal.poc.welcome.standardlife.co.uk and no alternative names.
+✔ CDK-generated CloudFormation templates should not include wildcard domains.
+✔ Unit tests must correctly verify SubjectAlternativeNames is either present or omitted when required.
+✔ Deployment should reflect the corrected configuration in ACM without regressions.
+
+
+---
+
+📌 Notes
+
+JIRA Ticket: [EMBER-XXX] (linked bug fix)
+
+Testing: ✅ Unit tests updated and validated via vitest.
+
+Next Steps: Deploy and verify ACM changes in AWS.
+
+
+🚀 Ready for review! Let me know if any refinements are needed. 🔥
+
+
+
