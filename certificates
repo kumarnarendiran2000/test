@@ -1,0 +1,124 @@
+Updating the Test Cases for Your New Certificate Implementation
+
+Since you have refactored CertificateStack to pass subjectAlternativeNames from the stack and created MockSlalCertificateStack without subject alternative names, you need to update the test cases accordingly.
+
+
+---
+
+1️⃣ Updating the Test for CertificateStack
+
+Since CertificateStack now gets subjectAlternativeNames from the stack, we need to:
+
+Ensure it contains only the correct subject alternative names as per the new logic.
+
+Remove unnecessary wildcards (*.).
+
+Validate the certificate for the expected domains.
+
+
+🛠 Updated certificate-stack.test.ts
+
+import { App } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { describe, test } from 'vitest';
+import { CertificateStack } from '../certificate-stack';
+
+describe('Certificate Stack', () => {
+  const app = new App();
+
+  const defaultAccount = '930688131692';
+  const defaultRegion = 'eu-west-1';
+  const environment = 'poc';
+
+  const stack = new CertificateStack(app, 'CertificateStack', {
+    props: {
+      env: { account: defaultAccount, region: defaultRegion },
+    },
+    envName: environment,
+    subjectAlternativeNames: ['staging.poc.welcome.standardlife.co.uk'], // Updated as per new logic
+  });
+
+  const template = Template.fromStack(stack);
+
+  test('stack should create a certificate with the correct domain and subject alternative names', () => {
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'poc.welcome.standardlife.co.uk',
+      SubjectAlternativeNames: ['staging.poc.welcome.standardlife.co.uk'], // Only staging if enabled
+    });
+  });
+});
+
+
+---
+
+2️⃣ New Test for MockSlalCertificateStack
+
+Since MockSlalCertificateStack does NOT have subjectAlternativeNames, we need a separate test to:
+
+Verify that it only has the main domain (mock-slal.poc.welcome.standardlife.co.uk).
+
+Ensure no subjectAlternativeNames exist.
+
+
+🛠 New mock-slal-certificate-stack.test.ts
+
+import { App } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { describe, test } from 'vitest';
+import { MockSlalCertificateStack } from '../mock-slal-certificate-stack';
+
+describe('MockSlal Certificate Stack', () => {
+  const app = new App();
+
+  const defaultAccount = '930688131692';
+  const defaultRegion = 'eu-west-1';
+
+  const stack = new MockSlalCertificateStack(app, 'MockSlalCertificateStack', {
+    props: {
+      env: { account: defaultAccount, region: defaultRegion },
+    },
+    envName: 'poc',
+  });
+
+  const template = Template.fromStack(stack);
+
+  test('stack should create a certificate with only the mock-slal domain and no alternative names', () => {
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'mock-slal.poc.welcome.standardlife.co.uk',
+      SubjectAlternativeNames: [], // No subject alternative names for Mock SLA
+    });
+  });
+});
+
+
+---
+
+🚀 Summary of Updates
+
+1️⃣ CertificateStack (Updated)
+
+✅ Has correct subject alternative names (staging.env.domain)
+✅ Removes wildcard *. and follows new implementation
+
+2️⃣ MockSlalCertificateStack (New Test)
+
+✅ Uses mock-slal.domainName as the main domain
+✅ Does NOT include any subjectAlternativeNames
+
+
+---
+
+🛠 Next Steps
+
+1️⃣ Replace your existing test (certificate-stack.test.ts) with the updated version.
+2️⃣ Create a new test file (mock-slal-certificate-stack.test.ts) for Mock SLA certificates.
+3️⃣ Run tests to validate:
+
+vitest
+
+4️⃣ Deploy to ensure certificates are correctly issued:
+
+cdk deploy
+
+📌 This ensures your tests match the new architecture and avoid unnecessary subject alternative names. Let me know if you need further refinements! 🚀
+
