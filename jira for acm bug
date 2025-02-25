@@ -1,0 +1,19 @@
+JIRA Bug Ticket: Incorrect Certificate SANs in ACM (Linked to EMBER-517)
+
+Title:
+
+Incorrect Subject Alternative Names (SANs) in ACM for Certificates
+
+Description:
+
+While testing EMBER-517 (Test Certificates), we identified an issue where wildcard (*.) subdomains were being incorrectly added to certificates in AWS Certificate Manager (ACM). Additionally, Mock SLA Server certificates inherited staging subdomains, which was unintended. This led to unnecessary domain permissions and misconfigured certificates.
+
+Acceptance Criteria:
+
+✅ Certificate Stack should correctly pass subjectAlternativeNames from the stack, avoiding wildcard entries.
+✅ Mock SLA Server certificates should be issued with only the required domain (mock-slal.poc.welcome.standardlife.co.uk) and no additional SANs.
+✅ ACM certificates should reflect only the expected domains as per environment requirements.
+✅ Tests should validate that SubjectAlternativeNames is correctly set or omitted when not needed.
+
+📌 Fix implemented, tested, and verified. 🚀
+
